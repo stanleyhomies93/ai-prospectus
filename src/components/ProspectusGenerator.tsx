@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FileTextIcon, CheckIcon, PlusIcon, EditIcon, EyeIcon, DownloadIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon, ClipboardCheckIcon, PanelLeftIcon, PanelRightIcon, LayoutTemplateIcon, ExternalLinkIcon, FileSpreadsheetIcon, TableIcon, ChevronDownIcon, ChevronRightIcon, SaveIcon, FolderIcon, FileIcon, SearchIcon, SettingsIcon, AlertTriangleIcon, TrashIcon, PresentationIcon, MonitorIcon, ChevronsRightIcon } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { FileTextIcon, CheckIcon, PlusIcon, EditIcon, EyeIcon, DownloadIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon, ClipboardCheckIcon, PanelLeftIcon, PanelRightIcon, LayoutTemplateIcon, ExternalLinkIcon, FileSpreadsheetIcon, TableIcon, ChevronDownIcon, ChevronRightIcon, SaveIcon, FolderIcon, FileIcon, SearchIcon, SettingsIcon, AlertTriangleIcon, TrashIcon, PresentationIcon, MonitorIcon, ChevronsRightIcon, UploadIcon, GlobeIcon, LinkIcon, BuildingIcon, BriefcaseIcon, InfoIcon, BotIcon, ZapIcon, RefreshCwIcon, CreditCardIcon, DollarSignIcon, BarChartIcon, ShoppingCartIcon } from 'lucide-react';
 import { SECDocumentPreview } from './SECDocumentPreview';
 import { FinancialDataUploader, FinancialData } from './FinancialDataUploader';
 import { FinancialDataPreview } from './FinancialDataPreview';
@@ -12,6 +12,7 @@ export function ProspectusGenerator() {
   const [financialData, setFinancialData] = useState<FinancialData | null>(null);
   const [showSidebar, setShowSidebar] = useState(true);
   const [showPresentationPreview, setShowPresentationPreview] = useState(false);
+  const [isProcessComplete, setIsProcessComplete] = useState(false);
   const [riskFactors, setRiskFactors] = useState([{
     title: 'Competitive Market Risk',
     description: 'We operate in a highly competitive market with numerous established competitors who may have greater resources than us.'
@@ -24,6 +25,28 @@ export function ProspectusGenerator() {
   }]);
   const [newRiskTitle, setNewRiskTitle] = useState('');
   const [newRiskDescription, setNewRiskDescription] = useState('');
+  const [companyInfoMethod, setCompanyInfoMethod] = useState<'manual' | 'ai' | null>(null);
+  const [companyWebsite, setCompanyWebsite] = useState('');
+  const [companyName, setCompanyName] = useState('TechFin Solutions');
+  const [companyDescription, setCompanyDescription] = useState('');
+  const [companyDeckUploaded, setCompanyDeckUploaded] = useState(false);
+  const [additionalResources, setAdditionalResources] = useState<Array<{
+    url: string;
+    addedAt: Date;
+  }>>([]);
+  const [resourceInputs, setResourceInputs] = useState<Array<{
+    id: string;
+    value: string;
+  }>>([{ id: '1', value: '' }]);
+  const [uploadedDocuments, setUploadedDocuments] = useState<Array<{
+    name: string;
+    size: number;
+    type: string;
+    uploadedAt: Date;
+  }>>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedSimilarCompanies, setSelectedSimilarCompanies] = useState<string[]>([]);
   const handleStepChange = step => {
     setActiveStep(step);
   };
@@ -47,6 +70,12 @@ export function ProspectusGenerator() {
   const resetFinancialData = () => {
     setFinancialData(null);
   };
+  
+  const handleCompleteProcess = () => {
+    setIsProcessComplete(true);
+    // In a real implementation, this would trigger the actual document generation
+    // For now, we'll just show the completion state
+  };
   const handleAddRiskFactor = () => {
     if (newRiskTitle.trim() === '' || newRiskDescription.trim() === '') return;
     setRiskFactors([...riskFactors, {
@@ -59,7 +88,132 @@ export function ProspectusGenerator() {
   const handleRemoveRiskFactor = (index: number) => {
     setRiskFactors(riskFactors.filter((_, i) => i !== index));
   };
-  return <div className="h-full flex flex-col">
+  const handleCompanyInfoMethodSelect = (method: 'manual' | 'ai') => {
+    setCompanyInfoMethod(method);
+  };
+  const handleCompanyDeckUpload = () => {
+    setCompanyDeckUploaded(true);
+  };
+  const handleSimilarCompanySelect = (ticker: string) => {
+    setSelectedSimilarCompanies(prev => {
+      // If already selected, remove it, otherwise add it
+      if (prev.includes(ticker)) {
+        return prev.filter(t => t !== ticker);
+      } else {
+        return [...prev, ticker];
+      }
+    });
+    // In a real implementation, we would fetch company data here
+    // For demo purposes, we'll still update the company name and description
+    // based on the most recently selected/deselected company
+    if (ticker === 'SQ') {
+      setCompanyName('Block, Inc.');
+      setCompanyDescription('Block, Inc. (formerly Square, Inc.) is a financial services and digital payments company that provides various tools and services to help businesses and individuals participate in the economy.');
+    } else if (ticker === 'PYPL') {
+      setCompanyName('PayPal Holdings, Inc.');
+      setCompanyDescription('PayPal Holdings, Inc. operates a global online payment system that supports online money transfers and serves as an electronic alternative to traditional paper methods like checks and money orders.');
+    } else if (ticker === 'AFRM') {
+      setCompanyName('Affirm Holdings, Inc.');
+      setCompanyDescription('Affirm Holdings, Inc. operates a platform for digital and mobile-first commerce. It offers a point-of-sale payment solution for consumers, merchant commerce solutions, and a consumer-focused app.');
+    }
+  };
+  const similarCompanies = [{
+    ticker: 'SQ',
+    name: 'Block, Inc.',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e2/Block_Inc_logo.svg'
+  }, {
+    ticker: 'PYPL',
+    name: 'PayPal',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a4/PayPal_2014_logo.svg'
+  }, {
+    ticker: 'AFRM',
+    name: 'Affirm',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/4/40/Affirm_Logo.svg'
+  }, {
+    ticker: 'ADYEY',
+    name: 'Adyen',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Adyen_Corporate_Logo.svg'
+  }, {
+    ticker: 'TOST',
+    name: 'Toast',
+    logo: 'https://d2odgkulk9w7if.cloudfront.net/images/default-source/logos/toast-logo-primary-rgb.svg'
+  }];
+  const handleCompanyDetailsSubmit = () => {
+    // In a real implementation, we would process the company details here
+    handleStepChange(2); // Move to the add content step
+  };
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setIsUploading(true);
+    // Simulate upload process
+    setTimeout(() => {
+      const newDocuments = Array.from(files).map(file => ({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        uploadedAt: new Date()
+      }));
+      setUploadedDocuments(prev => [...prev, ...newDocuments]);
+      setIsUploading(false);
+      setCompanyDeckUploaded(true);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }, 1500); // Simulate 1.5 second upload time
+  };
+  const handleRemoveDocument = (index: number) => {
+    setUploadedDocuments(prev => prev.filter((_, i) => i !== index));
+    if (uploadedDocuments.length <= 1) {
+      setCompanyDeckUploaded(false);
+    }
+  };
+  const handleAddResourceInput = () => {
+    const newId = Date.now().toString();
+    setResourceInputs(prev => [...prev, { id: newId, value: '' }]);
+  };
+
+  const handleRemoveResourceInput = (id: string) => {
+    if (resourceInputs.length > 1) {
+      setResourceInputs(prev => prev.filter(input => input.id !== id));
+    }
+  };
+
+  const handleResourceInputChange = (id: string, value: string) => {
+    setResourceInputs(prev => prev.map(input => 
+      input.id === id ? { ...input, value } : input
+    ));
+  };
+
+  const handleResourceInputBlur = (id: string, value: string) => {
+    if (value.trim()) {
+      // Basic URL validation
+      let url = value.trim();
+      if (!/^https?:\/\//i.test(url)) {
+        url = 'https://' + url;
+      }
+      
+      // Add to resources if not already added
+      const isDuplicate = additionalResources.some(resource => resource.url === url);
+      if (!isDuplicate) {
+        setAdditionalResources(prev => [...prev, {
+          url,
+          addedAt: new Date()
+        }]);
+      }
+      
+      // Clear this input field
+      setResourceInputs(prev => prev.map(input => 
+        input.id === id ? { ...input, value: '' } : input
+      ));
+    }
+  };
+
+  const handleRemoveResource = (index: number) => {
+    setAdditionalResources(prev => prev.filter((_, i) => i !== index));
+  };
+  return <div className="h-screen min-h-screen flex flex-col">
       {/* App Toolbar */}
       <div className="bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between">
         <div className="flex items-center">
@@ -67,7 +221,7 @@ export function ProspectusGenerator() {
             {showSidebar ? <PanelLeftIcon size={20} /> : <PanelRightIcon size={20} />}
           </button>
           <h1 className="text-lg font-semibold text-gray-900">
-            TechFin Solutions IPO Prospectus
+            {companyName} IPO Prospectus
           </h1>
         </div>
         <div className="flex items-center space-x-2">
@@ -85,19 +239,23 @@ export function ProspectusGenerator() {
           </button>
         </div>
       </div>
-      <div className="flex-1 flex">
+      <div className="flex-1 flex overflow-hidden relative">
         {/* Sidebar */}
-        {showSidebar && <div className="w-64 border-r border-gray-200 bg-white flex flex-col">
+        {showSidebar && <div className="w-64 border-r border-gray-200 bg-white flex flex-col h-full">
             {/* Progress indicator */}
             <div className="px-4 py-3 border-b border-gray-200">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium text-gray-700">
                   Document Progress
                 </span>
-                <span className="text-xs font-medium text-blue-700">45%</span>
+                <span className="text-xs font-medium text-blue-700">
+                  {activeStep === 1 ? '10%' : activeStep === 2 ? '25%' : activeStep === 3 ? '40%' : activeStep === 4 ? '60%' : activeStep === 5 ? '80%' : '90%'}
+                </span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-1.5">
-                <div className="bg-blue-600 h-1.5 rounded-full w-[45%]"></div>
+                <div className="bg-blue-600 h-1.5 rounded-full" style={{
+              width: activeStep === 1 ? '10%' : activeStep === 2 ? '25%' : activeStep === 3 ? '40%' : activeStep === 4 ? '60%' : activeStep === 5 ? '80%' : '90%'
+            }}></div>
               </div>
             </div>
             {/* Steps */}
@@ -107,7 +265,7 @@ export function ProspectusGenerator() {
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-2 ${activeStep === 1 ? 'bg-blue-700 text-white' : activeStep > 1 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}>
                     {activeStep > 1 ? <CheckIcon size={12} /> : '1'}
                   </div>
-                  <span className="text-sm font-medium">Select Template</span>
+                  <span className="text-sm font-medium">Company Details</span>
                 </div>
               </div>
               <div className="px-2 py-3">
@@ -132,11 +290,6 @@ export function ProspectusGenerator() {
                       <PanelLeftIcon size={14} className="mr-2" />
                       <span>Business Overview</span>
                     </div>
-                    <div className={`px-2 py-1.5 rounded flex items-center text-sm ${expandedSection === 'financialInfo' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`} onClick={() => handleSectionToggle('financialInfo')}>
-                      <TableIcon size={14} className="mr-2" />
-                      <span>Financial Information</span>
-                      {financialData && <CheckIcon size={14} className="ml-auto text-green-600" />}
-                    </div>
                     <div className="px-2 py-1.5 rounded flex items-center text-sm text-gray-400">
                       <PanelRightIcon size={14} className="mr-2" />
                       <span>Management Discussion</span>
@@ -152,7 +305,8 @@ export function ProspectusGenerator() {
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-2 ${activeStep === 3 ? 'bg-blue-700 text-white' : activeStep > 3 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}>
                     {activeStep > 3 ? <CheckIcon size={12} /> : '3'}
                   </div>
-                  <span className="text-sm font-medium">Review</span>
+                  <span className="text-sm font-medium">Financial Information</span>
+                  {financialData && <CheckIcon size={14} className="ml-auto text-green-600" />}
                 </div>
               </div>
               <div className="px-2 py-3">
@@ -160,12 +314,20 @@ export function ProspectusGenerator() {
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-2 ${activeStep === 4 ? 'bg-blue-700 text-white' : activeStep > 4 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}>
                     {activeStep > 4 ? <CheckIcon size={12} /> : '4'}
                   </div>
+                  <span className="text-sm font-medium">Review</span>
+                </div>
+              </div>
+              <div className="px-2 py-3">
+                <div className={`px-2 py-1.5 rounded flex items-center ${activeStep === 5 ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`} onClick={() => handleStepChange(5)}>
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-2 ${activeStep === 5 ? 'bg-blue-700 text-white' : activeStep > 5 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}`}>
+                    {activeStep > 5 ? <CheckIcon size={12} /> : '5'}
+                  </div>
                   <span className="text-sm font-medium">Generate</span>
                 </div>
               </div>
             </div>
             {/* Recent documents */}
-            <div className="border-t border-gray-200 p-4">
+            <div className="border-t border-gray-200 p-4 mt-auto">
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
                 Recent Documents
               </h3>
@@ -186,7 +348,7 @@ export function ProspectusGenerator() {
             </div>
           </div>}
         {/* Main content area */}
-        <div className="flex-1 bg-gray-50 overflow-auto">
+        <div className="flex-1 bg-gray-50 overflow-auto pb-20">
           {showSECPreview ? <div className="p-6">
               <div className="mb-6 flex justify-between items-center">
                 <h2 className="text-xl font-semibold text-gray-900">
@@ -208,101 +370,362 @@ export function ProspectusGenerator() {
                   Return to Editor
                 </button>
               </div>
-              <PresentationPreview financialData={financialData} riskFactors={riskFactors} companyName="TechFin Solutions" tickerSymbol="TFIN" exchange="Nasdaq Global Market" />
+              <PresentationPreview financialData={financialData} riskFactors={riskFactors} companyName={companyName} tickerSymbol="TFIN" exchange="Nasdaq Global Market" />
             </div> : <div className="p-6">
-              {/* Step 1: Select Template */}
+              {/* Step 1: Company Details */}
               {activeStep === 1 && <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                    Select a Prospectus Template
+                    Add Company Details
                   </h2>
                   <p className="text-gray-600 mb-6">
-                    Choose from our library of regulatory-compliant templates
-                    designed for different markets and company types.
+                    Let's start by gathering information about your company.
+                    This will help us create a more accurate and relevant
+                    prospectus.
                   </p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <div className={`p-4 border rounded-lg cursor-pointer transition-all ${selectedTemplate === 'standard' ? 'border-blue-500 bg-blue-50 shadow-md' : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'}`} onClick={() => handleTemplateSelect('standard')}>
-                      <div className="flex items-center mb-2">
-                        <LayoutTemplateIcon size={20} className="text-blue-700 mr-2" />
-                        <h4 className="font-semibold">
-                          Standard IPO Prospectus
-                        </h4>
+                  {!companyInfoMethod && <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                      <div className="bg-white p-6 border border-gray-200 rounded-lg hover:border-blue-400 hover:shadow-md transition-all cursor-pointer" onClick={() => handleCompanyInfoMethodSelect('manual')}>
+                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                          <UploadIcon size={24} className="text-blue-700" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          Manual Input
+                        </h3>
+                        <p className="text-gray-600 mb-4">
+                          Provide your company details manually by uploading
+                          documents, entering your company website, and
+                          describing your business.
+                        </p>
+                        <div className="text-blue-700 font-medium flex items-center">
+                          Get Started{' '}
+                          <ArrowRightIcon size={16} className="ml-1" />
+                        </div>
                       </div>
-                      <p className="text-sm text-gray-600">
-                        The most common format suitable for most companies.
-                      </p>
-                      <div className="mt-3 text-xs text-gray-500">
-                        SEC Form S-1 Compliant
+                      <div className="bg-white p-6 border border-gray-200 rounded-lg hover:border-blue-400 hover:shadow-md transition-all cursor-pointer" onClick={() => handleCompanyInfoMethodSelect('ai')}>
+                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                          <BotIcon size={24} className="text-blue-700" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          AI-Assisted
+                        </h3>
+                        <p className="text-gray-600 mb-4">
+                          Let our AI help you by finding similar public
+                          companies. We'll use their data as a starting point
+                          for your prospectus.
+                        </p>
+                        <div className="text-blue-700 font-medium flex items-center">
+                          Find Similar Companies{' '}
+                          <ArrowRightIcon size={16} className="ml-1" />
+                        </div>
                       </div>
-                    </div>
-                    <div className={`p-4 border rounded-lg cursor-pointer transition-all ${selectedTemplate === 'tech' ? 'border-blue-500 bg-blue-50 shadow-md' : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'}`} onClick={() => handleTemplateSelect('tech')}>
-                      <div className="flex items-center mb-2">
-                        <LayoutTemplateIcon size={20} className="text-blue-700 mr-2" />
-                        <h4 className="font-semibold">Technology Company</h4>
+                    </div>}
+                  {companyInfoMethod === 'manual' && <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                        Manual Company Information
+                      </h3>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Left Column - Manual Company Information */}
+                        <div className="space-y-6">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Company Name
+                            </label>
+                            <input type="text" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., TechFin Solutions, Inc." value={companyName} onChange={e => setCompanyName(e.target.value)} />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Company Website
+                            </label>
+                            <div className="flex">
+                              <div className="flex items-center bg-gray-100 border border-gray-300 rounded-l-md px-3">
+                                <GlobeIcon size={16} className="text-gray-500" />
+                              </div>
+                              <input type="text" className="w-full p-2 border border-gray-300 border-l-0 rounded-r-md focus:ring-blue-500 focus:border-blue-500" placeholder="www.techfinsolutions.com" value={companyWebsite} onChange={e => setCompanyWebsite(e.target.value)} />
+                            </div>
+                            <p className="mt-1 text-sm text-gray-500">
+                              We'll analyze your website to gather information
+                              about your business.
+                            </p>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Company Description
+                            </label>
+                            <textarea className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" rows={4} placeholder="Describe your company's business model, products/services, and target market..." value={companyDescription} onChange={e => setCompanyDescription(e.target.value)}></textarea>
+                          </div>
+                        </div>
+
+                        {/* Right Column - Document Uploads and Additional Resources */}
+                        <div className="space-y-6">
+                          <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                            <h4 className="font-medium text-gray-800 mb-2 flex items-center">
+                              <UploadIcon size={18} className="mr-2 text-blue-700" />
+                              Upload Company Documents
+                            </h4>
+                            <p className="text-sm text-gray-600 mb-3">
+                              Upload any relevant company documents to help create
+                              a more accurate prospectus. You can add multiple
+                              documents.
+                            </p>
+                            {/* List of uploaded documents */}
+                            <div className="space-y-3 mb-4">
+                              {uploadedDocuments.map((doc, index) => <div key={index} className="border border-green-300 bg-green-50 rounded-md p-3 flex items-center justify-between">
+                                  <div className="flex items-center">
+                                    <FileTextIcon size={20} className="mr-3 text-green-600" />
+                                    <div>
+                                      <p className="text-sm font-medium text-gray-700">
+                                        {doc.name}
+                                      </p>
+                                      <p className="text-xs text-gray-500">
+                                        {(doc.size / 1024 / 1024).toFixed(2)} MB •
+                                        Uploaded{' '}
+                                        {doc.uploadedAt.toLocaleTimeString()}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center">
+                                    <button className="p-1 text-gray-500 hover:text-red-600 mr-2" onClick={() => handleRemoveDocument(index)}>
+                                      <TrashIcon size={16} />
+                                    </button>
+                                    <div className="flex items-center text-green-600 text-sm">
+                                      <CheckIcon size={16} className="mr-1" />
+                                      Uploaded
+                                    </div>
+                                  </div>
+                                </div>)}
+                            </div>
+                            {/* Hidden file input */}
+                            <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileSelect} multiple accept=".pdf,.docx,.xlsx,.ppt,.pptx" />
+                            {/* Document upload area */}
+                            <div className="border border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center bg-white hover:bg-gray-50 cursor-pointer transition-colors" onClick={() => fileInputRef.current?.click()}>
+                              {isUploading ? <>
+                                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700 mb-2"></div>
+                                  <p className="text-sm font-medium text-blue-700 mb-1">
+                                    Uploading document...
+                                  </p>
+                                </> : <>
+                                  <UploadIcon size={24} className="text-blue-600 mb-2" />
+                                  <p className="text-sm font-medium text-blue-700 mb-1">
+                                    Drag and drop files or click to browse
+                                  </p>
+                                  <p className="text-xs text-gray-500 mb-3">
+                                    PDF, DOCX, XLSX, PPT, PPTX (max 20MB per file)
+                                  </p>
+                                  <button className="px-4 py-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors" onClick={e => {
+                          e.stopPropagation();
+                          fileInputRef.current?.click();
+                        }}>
+                                    Select Files
+                                  </button>
+                                </>}
+                            </div>
+                            <div className="mt-4 flex justify-between items-center">
+                              <p className="text-xs text-gray-500">
+                                {uploadedDocuments.length > 0 ? `${uploadedDocuments.length} document${uploadedDocuments.length > 1 ? 's' : ''} uploaded` : 'No documents uploaded yet'}
+                              </p>
+                              <button className="text-blue-700 text-sm flex items-center hover:text-blue-800">
+                                <RefreshCwIcon size={14} className="mr-1" />
+                                Scan Documents with AI
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="border border-gray-200 rounded-lg p-4 bg-blue-50">
+                            <h4 className="font-medium text-blue-800 mb-2 flex items-center">
+                              <LinkIcon size={18} className="mr-2 text-blue-700" />
+                              Add Additional Resources
+                            </h4>
+                            <p className="text-sm text-gray-700 mb-3">
+                              Add multiple links to additional resources that can help us
+                              understand your business better. You can add company websites, 
+                              press releases, investor relations pages, and more.
+                            </p>
+                            
+                            {/* Resource counter and clear all button */}
+                            {additionalResources.length > 0 && (
+                              <div className="flex justify-between items-center mb-3">
+                                <p className="text-sm font-medium text-blue-700">
+                                  {additionalResources.length} resource{additionalResources.length !== 1 ? 's' : ''} added
+                                </p>
+                                <button 
+                                  onClick={() => setAdditionalResources([])} 
+                                  className="text-xs text-red-600 hover:text-red-800 hover:bg-red-50 px-2 py-1 rounded"
+                                >
+                                  Clear All
+                                </button>
+                              </div>
+                            )}
+                            
+                            {/* List of added resources */}
+                            {additionalResources.length > 0 && (
+                              <div className="space-y-2 mb-4 max-h-32 overflow-y-auto">
+                                {additionalResources.map((resource, index) => (
+                                  <div key={index} className="flex items-center justify-between bg-white rounded-md p-3 border border-blue-200 hover:border-blue-300 transition-colors">
+                                    <div className="flex items-center flex-1 min-w-0">
+                                      <LinkIcon size={16} className="text-blue-600 mr-2 flex-shrink-0" />
+                                      <a 
+                                        href={resource.url} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="text-blue-600 hover:text-blue-800 text-sm truncate flex-1"
+                                        title={resource.url}
+                                      >
+                                        {resource.url}
+                                      </a>
+                                    </div>
+                                    <div className="flex items-center ml-2">
+                                      <span className="text-xs text-gray-500 mr-2">
+                                        {resource.addedAt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                      </span>
+                                      {additionalResources.length > 1 && (
+                                        <button 
+                                          onClick={() => handleRemoveResource(index)} 
+                                          className="text-gray-400 hover:text-red-500 p-1 rounded hover:bg-red-50"
+                                          title="Remove resource"
+                                        >
+                                          <TrashIcon size={14} />
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            
+                                                          {/* Add new resource inputs */}
+                              <div className="space-y-3">
+                                {resourceInputs.map((input, index) => (
+                                  <div key={input.id} className="flex items-center space-x-2">
+                                    <input 
+                                      type="text" 
+                                      className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                      placeholder="https://example.com/about-us, press releases, investor relations..." 
+                                      value={input.value} 
+                                      onChange={e => handleResourceInputChange(input.id, e.target.value)}
+                                      onBlur={e => handleResourceInputBlur(input.id, e.target.value)}
+                                      onKeyPress={e => e.key === 'Enter' && handleResourceInputBlur(input.id, input.value)}
+                                    />
+                                    {resourceInputs.length > 1 && (
+                                      <button 
+                                        onClick={() => handleRemoveResourceInput(input.id)}
+                                        className="text-red-500 hover:text-red-700 p-2 rounded hover:bg-red-50"
+                                        title="Remove input field"
+                                      >
+                                        <TrashIcon size={16} />
+                                      </button>
+                                    )}
+                                  </div>
+                                ))}
+                                
+                                {/* Add Link text button */}
+                                <div className="flex justify-center">
+                                  <button 
+                                    className="text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-3 py-1 rounded transition-colors"
+                                    onClick={handleAddResourceInput}
+                                  >
+                                    + Add Link
+                                  </button>
+                                </div>
+                              </div>
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-sm text-gray-600">
-                        Tailored for SaaS, fintech, and other tech companies.
-                      </p>
-                      <div className="mt-3 text-xs text-gray-500">
-                        Enhanced IP and R&D sections
+                      {/* Navigation handled by sticky bar */}
+                    </div>}
+                  {companyInfoMethod === 'ai' && <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+                      <div className="flex items-center mb-4">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                          <BotIcon size={20} className="text-blue-700" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          AI-Assisted Company Selection
+                        </h3>
                       </div>
-                    </div>
-                    <div className={`p-4 border rounded-lg cursor-pointer transition-all ${selectedTemplate === 'international' ? 'border-blue-500 bg-blue-50 shadow-md' : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'}`} onClick={() => handleTemplateSelect('international')}>
-                      <div className="flex items-center mb-2">
-                        <LayoutTemplateIcon size={20} className="text-blue-700 mr-2" />
-                        <h4 className="font-semibold">
-                          International Dual-Listing
-                        </h4>
+                      <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                        <div className="flex items-start">
+                          <InfoIcon size={20} className="text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
+                          <div>
+                            <h5 className="font-medium text-blue-800">
+                              How This Works
+                            </h5>
+                            <p className="text-sm text-gray-700 mt-1">
+                              Select a similar public company from the list
+                              below. Our AI will use this company's data as a
+                              reference to help create your prospectus, adapting
+                              it to your specific business.
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-sm text-gray-600">
-                        For companies listing on multiple exchanges.
-                      </p>
-                      <div className="mt-3 text-xs text-gray-500">
-                        NYSE + International Exchange
+                      <div className="mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Search for a Similar Company
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <SearchIcon size={16} className="text-gray-400" />
+                          </div>
+                          <input type="text" className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="Search by company name or ticker..." />
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
-                    <h4 className="font-semibold text-blue-800 mb-2">
-                      Template Preview
-                    </h4>
-                    <p className="text-gray-700">
-                      The{' '}
-                      {selectedTemplate === 'standard' ? 'Standard IPO Prospectus' : selectedTemplate === 'tech' ? 'Technology Company' : 'International Dual-Listing'}{' '}
-                      template includes:
-                    </p>
-                    <ul className="mt-2 space-y-1 text-gray-600">
-                      <li className="flex items-center">
-                        <CheckIcon size={16} className="text-green-600 mr-2" />
-                        <span>Complete required SEC disclosures</span>
-                      </li>
-                      <li className="flex items-center">
-                        <CheckIcon size={16} className="text-green-600 mr-2" />
-                        <span>
-                          {selectedTemplate === 'standard' ? 'Standard risk factors section' : selectedTemplate === 'tech' ? 'Technology-specific risk factors' : 'Multi-jurisdiction compliance sections'}
-                        </span>
-                      </li>
-                      <li className="flex items-center">
-                        <CheckIcon size={16} className="text-green-600 mr-2" />
-                        <span>
-                          {selectedTemplate === 'standard' ? 'General business overview structure' : selectedTemplate === 'tech' ? 'R&D and IP-focused business sections' : 'Global operations and currency risk sections'}
-                        </span>
-                      </li>
-                    </ul>
-                    <div className="mt-4">
-                      <button className="text-blue-700 hover:text-blue-800 flex items-center text-sm font-medium" onClick={toggleSECPreview}>
-                        <ExternalLinkIcon size={16} className="mr-1" />
-                        View SEC filing example
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <button className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800 flex items-center" onClick={() => handleStepChange(2)}>
-                      Next: Add Content
-                      <ArrowRightIcon size={16} className="ml-2" />
-                    </button>
-                  </div>
+                      <h4 className="font-medium text-gray-800 mb-3">
+                        Select a Similar Company
+                      </h4>
+                      <div className="space-y-3 mb-6">
+                        {similarCompanies.map(company => <div key={company.ticker} className={`border ${selectedSimilarCompanies.includes(company.ticker) ? 'border-blue-500 bg-blue-50' : 'border-gray-200'} rounded-lg p-3 flex items-center cursor-pointer hover:border-blue-300 transition-colors`} onClick={() => handleSimilarCompanySelect(company.ticker)}>
+                            <div className="w-10 h-10 bg-white rounded border border-gray-200 flex items-center justify-center mr-3 overflow-hidden">
+                              {company.ticker === 'SQ' && <div className="text-blue-600">
+                                  <BuildingIcon size={24} />
+                                </div>}
+                              {company.ticker === 'PYPL' && <div className="text-indigo-600">
+                                  <CreditCardIcon size={24} />
+                                </div>}
+                              {company.ticker === 'AFRM' && <div className="text-purple-600">
+                                  <DollarSignIcon size={24} />
+                                </div>}
+                              {company.ticker === 'ADYEY' && <div className="text-green-600">
+                                  <BarChartIcon size={24} />
+                                </div>}
+                              {company.ticker === 'TOST' && <div className="text-orange-600">
+                                  <ShoppingCartIcon size={24} />
+                                </div>}
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <h5 className="font-medium text-gray-900">
+                                  {company.name}
+                                </h5>
+                                <span className="text-sm font-mono text-gray-500">
+                                  {company.ticker}
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-600">
+                                Financial Technology
+                              </p>
+                            </div>
+                            {selectedSimilarCompanies.includes(company.ticker) && <div className="ml-3 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                                <CheckIcon size={14} className="text-white" />
+                              </div>}
+                          </div>)}
+                      </div>
+                      {selectedSimilarCompanies.length > 0 && <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                          <div className="flex items-start">
+                            <ZapIcon size={20} className="text-green-600 mt-0.5 mr-3 flex-shrink-0" />
+                            <div>
+                              <h5 className="font-medium text-green-800">
+                                {selectedSimilarCompanies.length === 1 ? 'Company Selected' : `${selectedSimilarCompanies.length} Companies Selected`}
+                              </h5>
+                              <p className="text-sm text-gray-700 mt-1">
+                                {selectedSimilarCompanies.length === 1 ? `We'll use ${similarCompanies.find(c => c.ticker === selectedSimilarCompanies[0])?.name}'s data as a reference.` : `We'll use data from ${selectedSimilarCompanies.map(ticker => similarCompanies.find(c => c.ticker === ticker)?.name).join(', ')} as references.`}{' '}
+                                You'll be able to customize all information in
+                                the next steps.
+                              </p>
+                            </div>
+                          </div>
+                        </div>}
+                      {/* Navigation handled by sticky bar */}
+                    </div>}
                 </div>}
-              {/* Step 2: Add Content */}
+              {/* Step 2: Add Content (formerly Step 3) */}
               {activeStep === 2 && <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">
                     Add Content to Your Prospectus
@@ -477,7 +900,7 @@ export function ProspectusGenerator() {
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                               Company Description
                             </label>
-                            <textarea className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" rows={4} placeholder="Describe your company's main business activities..." defaultValue="TechFin Solutions is a financial technology company that provides innovative payment processing solutions for small and medium-sized businesses. Founded in 2015, we have developed proprietary software that integrates with existing point-of-sale systems."></textarea>
+                            <textarea className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" rows={4} placeholder="Describe your company's main business activities..." defaultValue={companyDescription || `${companyName} is a financial technology company that provides innovative payment processing solutions for small and medium-sized businesses. Founded in 2015, we have developed proprietary software that integrates with existing point-of-sale systems.`}></textarea>
                             <div className="mt-1 flex items-center text-sm text-gray-500">
                               <span>
                                 AI suggests adding details about market position
@@ -622,7 +1045,7 @@ export function ProspectusGenerator() {
                   <div className="flex justify-between mt-6">
                     <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 flex items-center" onClick={() => handleStepChange(1)}>
                       <ArrowLeftIcon size={16} className="mr-2" />
-                      Back to Templates
+                      Back to Company Details
                     </button>
                     <button className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800 flex items-center" onClick={() => handleStepChange(3)}>
                       Next: Review
@@ -630,8 +1053,42 @@ export function ProspectusGenerator() {
                     </button>
                   </div>
                 </div>}
-              {/* Step 3: Review */}
+              {/* Step 3: Financial Information */}
               {activeStep === 3 && <div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                    Financial Information
+                  </h2>
+                  <p className="text-gray-600 mb-6">
+                    Upload and configure your financial data to include in the prospectus.
+                    This information is crucial for investor decision-making.
+                  </p>
+                  <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
+                    <div className="p-6">
+                      <div className="mb-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                          Upload Financial Data
+                        </h3>
+                        <p className="text-gray-600 mb-4">
+                          Upload your financial statements, balance sheets, income statements, 
+                          and other financial documents. We'll automatically parse and format 
+                          this data for your prospectus.
+                        </p>
+                        <FinancialDataUploader onDataParsed={handleFinancialDataParsed} />
+                      </div>
+                      
+                      {financialData && (
+                        <div className="mt-6">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                            Financial Data Preview
+                          </h3>
+                          <FinancialDataPreview data={financialData} onReset={resetFinancialData} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>}
+              {/* Step 4: Review (formerly Step 3) */}
+              {activeStep === 4 && <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">
                     Review Your Prospectus
                   </h2>
@@ -663,7 +1120,7 @@ export function ProspectusGenerator() {
                           PROSPECTUS
                         </h4>
                         <h5 className="text-center mb-4">
-                          TechFin Solutions, Inc.
+                          {companyName}, Inc.
                         </h5>
                         <div className="text-center text-sm mb-6">
                           10,000,000 Shares of Common Stock
@@ -672,10 +1129,10 @@ export function ProspectusGenerator() {
                           <p className="mb-3">
                             This prospectus relates to the initial public
                             offering of 10,000,000 shares of common stock of
-                            TechFin Solutions, Inc. Prior to this offering,
-                            there has been no public market for our common
-                            stock. The initial public offering price is expected
-                            to be between $14.00 and $16.00 per share.
+                            {companyName}, Inc. Prior to this offering, there
+                            has been no public market for our common stock. The
+                            initial public offering price is expected to be
+                            between $14.00 and $16.00 per share.
                           </p>
                           <p className="mb-3">
                             We have applied to list our common stock on the
@@ -688,12 +1145,7 @@ export function ProspectusGenerator() {
                             BUSINESS OVERVIEW
                           </h6>
                           <p className="mb-3">
-                            TechFin Solutions is a financial technology company
-                            that provides innovative payment processing
-                            solutions for small and medium-sized businesses.
-                            Founded in 2015, we have developed proprietary
-                            software that integrates with existing point-of-sale
-                            systems.
+                            {companyDescription || `${companyName} is a financial technology company that provides innovative payment processing solutions for small and medium-sized businesses. Founded in 2015, we have developed proprietary software that integrates with existing point-of-sale systems.`}
                           </p>
                           <p className="mb-3">
                             Our primary products include our Payment Processing
@@ -776,8 +1228,8 @@ export function ProspectusGenerator() {
                     </button>
                   </div>
                 </div>}
-              {/* Step 4: Generate */}
-              {activeStep === 4 && <div>
+              {/* Step 5: Generate (formerly Step 4) */}
+              {activeStep === 5 && <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">
                     Generate Your Prospectus
                   </h2>
@@ -795,7 +1247,8 @@ export function ProspectusGenerator() {
                       have been resolved.
                     </p>
                     <div className="inline-flex items-center justify-center bg-white text-sm font-medium text-gray-700 px-4 py-2 border border-gray-300 rounded-md shadow-sm">
-                      TechFin_Solutions_IPO_Prospectus_Draft_v1.pdf
+                      {companyName.replace(/\s+/g, '_')}
+                      _IPO_Prospectus_Draft_v1.pdf
                     </div>
                     <div className="mt-4 flex justify-center space-x-4">
                       <button className="text-blue-700 hover:text-blue-800 flex items-center text-sm font-medium" onClick={toggleSECPreview}>
@@ -905,7 +1358,134 @@ export function ProspectusGenerator() {
                     </button>
                   </div>
                 </div>}
+              
+              {/* Completion State */}
+              {isProcessComplete && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
+                  <div className="bg-white rounded-lg p-8 max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+                    <div className="text-center mb-6">
+                      <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <CheckIcon size={32} className="text-green-600" />
+                      </div>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                        Prospectus Generation Complete!
+                      </h2>
+                      <p className="text-gray-600">
+                        Your IPO prospectus has been successfully generated and is ready for download.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-4 mb-6">
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-green-800 mb-2">Generated Documents:</h3>
+                        <ul className="space-y-2 text-sm">
+                          <li className="flex items-center">
+                            <CheckIcon size={16} className="text-green-600 mr-2" />
+                            <span className="font-medium">{companyName.replace(/\s+/g, '_')}_IPO_Prospectus.pdf</span>
+                            <span className="text-gray-500 ml-2">(SEC Filing Format)</span>
+                          </li>
+                          <li className="flex items-center">
+                            <CheckIcon size={16} className="text-green-600 mr-2" />
+                            <span className="font-medium">{companyName.replace(/\s+/g, '_')}_IPO_Prospectus.docx</span>
+                            <span className="text-gray-500 ml-2">(Editable Word Document)</span>
+                          </li>
+                          <li className="flex items-center">
+                            <CheckIcon size={16} className="text-green-600 mr-2" />
+                            <span className="font-medium">{companyName.replace(/\s+/g, '_')}_IPO_Prospectus.xbrl</span>
+                            <span className="text-gray-500 ml-2">(XBRL Format for SEC)</span>
+                          </li>
+                          <li className="flex items-center">
+                            <CheckIcon size={16} className="text-green-600 mr-2" />
+                            <span className="font-medium">{companyName.replace(/\s+/g, '_')}_Investor_Presentation.pptx</span>
+                            <span className="text-gray-500 ml-2">(PowerPoint Presentation)</span>
+                          </li>
+                        </ul>
+                      </div>
+                      
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-blue-800 mb-2">Next Steps:</h3>
+                        <ol className="space-y-2 text-sm text-blue-700">
+                          <li>1. Review all generated documents for accuracy</li>
+                          <li>2. Have legal counsel review the prospectus</li>
+                          <li>3. Submit to SEC for review (if applicable)</li>
+                          <li>4. Prepare for investor roadshow</li>
+                        </ol>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-center space-x-4">
+                      <button 
+                        className="px-6 py-3 bg-blue-700 text-white rounded-lg hover:bg-blue-800 flex items-center"
+                        onClick={() => {
+                          // In a real implementation, this would trigger downloads
+                          alert('Download functionality would be implemented here');
+                        }}
+                      >
+                        <DownloadIcon size={20} className="mr-2" />
+                        Download All Documents
+                      </button>
+                      <button 
+                        className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                        onClick={() => setIsProcessComplete(false)}
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>}
+        </div>
+        
+        {/* Sticky Navigation Bar */}
+        <div className={`fixed bottom-0 bg-white border-t border-gray-200 px-6 py-4 shadow-lg z-50 transition-all duration-300 ${showSidebar ? 'left-64' : 'left-0'} right-0`}>
+          <div className="flex justify-between items-center max-w-7xl mx-auto">
+            <div className="flex items-center space-x-4">
+              <button 
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 flex items-center transition-colors"
+                onClick={() => {
+                  if (activeStep === 1 && companyInfoMethod) {
+                    setCompanyInfoMethod(null);
+                  } else if (activeStep > 1) {
+                    handleStepChange(activeStep - 1);
+                  }
+                }}
+                disabled={activeStep === 1 && !companyInfoMethod}
+              >
+                <ArrowLeftIcon size={16} className="mr-2" />
+                Back
+              </button>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-500">
+                Step {activeStep} of 5
+              </span>
+              <button 
+                className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800 flex items-center transition-colors"
+                onClick={() => {
+                  if (activeStep === 1 && !companyInfoMethod) {
+                    // Do nothing - user needs to select method first
+                  } else if (activeStep === 1 && companyInfoMethod) {
+                    handleCompanyDetailsSubmit();
+                  } else if (activeStep < 5) {
+                    handleStepChange(activeStep + 1);
+                  } else if (activeStep === 5) {
+                    handleCompleteProcess();
+                  }
+                }}
+                disabled={activeStep === 1 && !companyInfoMethod}
+              >
+                {activeStep === 1 && !companyInfoMethod ? 'Select Method' :
+                 activeStep === 1 && companyInfoMethod ? 'Next: Add Content' :
+                 activeStep === 2 ? 'Next: Financial Information' :
+                 activeStep === 3 ? 'Next: Review' :
+                 activeStep === 4 ? 'Next: Generate' :
+                 'Complete Process'}
+                <ArrowRightIcon size={16} className="ml-2" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>;
