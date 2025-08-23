@@ -3,7 +3,7 @@ import { ChevronLeftIcon, ChevronRightIcon, PrinterIcon, DownloadIcon } from 'lu
 import { FinancialData } from './FinancialDataUploader';
 
 interface SECDocumentPreviewProps {
-  financialData?: FinancialData | null;
+  financialData?: FinancialData[] | null;
   // Company Information
   companyName?: string;
   companyAddress?: string;
@@ -47,18 +47,40 @@ export function SECDocumentPreview({
   relatedCompany = 'TechFin Holdings Ltd.'
 }: SECDocumentPreviewProps) {
   // Function to extract financial figures from uploaded data
-  const getFinancialFigure = (rowIndex: number, columnIndex: number, defaultValue: string): string => {
-    if (!financialData || !financialData.rows[rowIndex] || !financialData.rows[rowIndex][columnIndex]) {
+  const getFinancialFigure = (rowIndex: number, columnIndex: number, defaultValue: string, documentType?: string): string => {
+    if (!financialData || financialData.length === 0) {
       return defaultValue;
     }
-    const value = financialData.rows[rowIndex][columnIndex];
-    if (typeof value === 'number') {
-      return new Intl.NumberFormat('en-US', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-      }).format(value);
+    
+    // If documentType is specified, look for that specific document type
+    if (documentType) {
+      const targetDoc = financialData.find(doc => doc.type === documentType);
+      if (targetDoc && targetDoc.rows[rowIndex] && targetDoc.rows[rowIndex][columnIndex]) {
+        const value = targetDoc.rows[rowIndex][columnIndex];
+        if (typeof value === 'number') {
+          return new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+          }).format(value);
+        }
+        return String(value);
+      }
     }
-    return String(value);
+    
+    // Fallback to first document if no specific type found
+    const firstDoc = financialData[0];
+    if (firstDoc && firstDoc.rows[rowIndex] && firstDoc.rows[rowIndex][columnIndex]) {
+      const value = firstDoc.rows[rowIndex][columnIndex];
+      if (typeof value === 'number') {
+        return new Intl.NumberFormat('en-US', {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2
+        }).format(value);
+      }
+      return String(value);
+    }
+    
+    return defaultValue;
   };
 
   // Function to highlight financial figures in text
@@ -79,17 +101,24 @@ export function SECDocumentPreview({
   };
 
   // Extract common financial figures for use throughout the document
-  // Expected Excel format: Row 0 = Revenue, Row 1 = Net Loss, Row 2 = Total Assets, Row 3 = Total Liabilities, Row 4 = Cash
-  // Columns: 0 = Description, 1 = 2023, 2 = 2022, 3 = 2021
-  const revenue2023 = getFinancialFigure(0, 1, '45.2M');
-  const revenue2022 = getFinancialFigure(0, 2, '32.1M');
-  const revenue2021 = getFinancialFigure(0, 3, '18.7M');
-  const netLoss2023 = getFinancialFigure(1, 1, '8.9M');
-  const netLoss2022 = getFinancialFigure(1, 2, '12.8M');
-  const netLoss2021 = getFinancialFigure(1, 3, '15.2M');
-  const totalAssets = getFinancialFigure(2, 1, '67.3M');
-  const totalLiabilities = getFinancialFigure(3, 1, '23.1M');
-  const cashBalance = getFinancialFigure(4, 1, '28.5M');
+  // Try to get data from specific document types first, then fall back to general data
+  const revenue2023 = getFinancialFigure(0, 1, '45.2M', 'income');
+  const revenue2022 = getFinancialFigure(0, 2, '32.1M', 'income');
+  const revenue2021 = getFinancialFigure(0, 3, '18.7M', 'income');
+  const netLoss2023 = getFinancialFigure(1, 1, '8.9M', 'income');
+  const netLoss2022 = getFinancialFigure(1, 2, '12.8M', 'income');
+  const netLoss2021 = getFinancialFigure(1, 3, '15.2M', 'income');
+  const totalAssets = getFinancialFigure(2, 1, '67.3M', 'balance');
+  const totalLiabilities = getFinancialFigure(3, 1, '23.1M', 'balance');
+  const cashBalance = getFinancialFigure(4, 1, '28.5M', 'balance');
+  
+  // Extract liquidity data if available
+  const currentAssets2024 = getFinancialFigure(2, 1, '15,466,233', 'liquidity');
+  const currentAssets2025 = getFinancialFigure(2, 2, '3,344,458', 'liquidity');
+  const currentLiabilities2024 = getFinancialFigure(9, 1, '8,990,995', 'liquidity');
+  const currentLiabilities2025 = getFinancialFigure(9, 2, '2,999,156', 'liquidity');
+  const netCurrentAssets2024 = getFinancialFigure(10, 1, '6,475,238', 'liquidity');
+  const netCurrentAssets2025 = getFinancialFigure(10, 2, '345,302', 'liquidity');
   return <div className="w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
       <div className="border-b border-gray-300 bg-gray-100 p-3 flex justify-between items-center">
         <div className="flex items-center">
@@ -615,50 +644,63 @@ export function SECDocumentPreview({
             </p>
           </div>
           
-                      {financialData && <div className="my-12">
-              <p className="text-xl font-bold mb-4">FINANCIAL INFORMATION</p>
-              <p className="mb-4 text-sm">
-                The following table presents our{' '}
-                {financialData.title.toLowerCase()}. The financial data should
-                be read in conjunction with our consolidated financial
-                statements and related notes, "Selected Consolidated Financial
-                Data" and "Management's Discussion and Analysis of Financial
-                Condition and Results of Operations" appearing elsewhere in this
-                prospectus. <span className="bg-green-100 px-1 rounded text-xs">This uploaded data is also dynamically integrated throughout the prospectus narrative above.</span>
-              </p>
-              <p className="text-sm mb-2 font-bold">{financialData.title}</p>
-              {financialData.period && <p className="text-sm mb-4">{financialData.period}</p>}
-              <div className="text-xs text-gray-700 mb-2">
-                (in thousands, except per share data)
-              </div>
-              <table className="w-full border-collapse border border-black text-sm mb-8">
-                <thead>
-                  <tr className="border-b border-black">
-                    {financialData.headers.map((header, index) => <th key={index} className={`border-r border-black p-2 ${index === 0 ? 'text-left' : 'text-center'}`}>
-                        {header}
-                      </th>)}
-                  </tr>
-                </thead>
-                <tbody>
-                  {financialData.rows.map((row, rowIndex) => <tr key={rowIndex} className="border-b border-black">
-                      {row.map((cell, cellIndex) => {
-                  const formattedValue = typeof cell === 'number' ? new Intl.NumberFormat('en-US', {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2
-                  }).format(cell) : cell;
-                  return <td key={cellIndex} className={`border-r border-black p-2 ${cellIndex === 0 ? '' : 'text-right'}`}>
-                            {formattedValue}
-                          </td>;
-                })}
-                    </tr>)}
-                </tbody>
-              </table>
-              <p className="text-sm mb-4">
-                (1) See "Management's Discussion and Analysis of Financial
-                Condition and Results of Operations" for a description of the
-                items affecting our financial performance.
-              </p>
-            </div>}
+                      {financialData && financialData.length > 0 && (
+                        <div className="my-12">
+                          <p className="text-xl font-bold mb-4">FINANCIAL INFORMATION</p>
+                          <p className="mb-4 text-sm">
+                            The following tables present our financial data. The financial data should
+                            be read in conjunction with our consolidated financial
+                            statements and related notes, "Selected Consolidated Financial
+                            Data" and "Management's Discussion and Analysis of Financial
+                            Condition and Results of Operations" appearing elsewhere in this
+                            prospectus. <span className="bg-green-100 px-1 rounded text-xs">This uploaded data is also dynamically integrated throughout the prospectus narrative above.</span>
+                          </p>
+                          
+                          {financialData.map((doc, docIndex) => (
+                            <div key={docIndex} className="mb-8">
+                              <p className="text-sm mb-2 font-bold">{doc.title}</p>
+                              {doc.period && <p className="text-sm mb-4">{doc.period}</p>}
+                              <div className="text-xs text-gray-700 mb-2">
+                                (in thousands, except per share data)
+                              </div>
+                              <table className="w-full border-collapse border border-black text-sm mb-4">
+                                <thead>
+                                  <tr className="border-b border-black">
+                                    {doc.headers.map((header: string, index: number) => (
+                                      <th key={index} className={`border-r border-black p-2 ${index === 0 ? 'text-left' : 'text-center'}`}>
+                                        {header}
+                                      </th>
+                                    ))}
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {doc.rows.map((row: (string | number)[], rowIndex: number) => (
+                                    <tr key={rowIndex} className="border-b border-black">
+                                      {row.map((cell: string | number, cellIndex: number) => {
+                                        const formattedValue = typeof cell === 'number' ? new Intl.NumberFormat('en-US', {
+                                          minimumFractionDigits: 0,
+                                          maximumFractionDigits: 2
+                                        }).format(cell) : cell;
+                                        return (
+                                          <td key={cellIndex} className={`border-r border-black p-2 ${cellIndex === 0 ? '' : 'text-right'}`}>
+                                            {formattedValue}
+                                          </td>
+                                        );
+                                      })}
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          ))}
+                          
+                          <p className="text-sm mb-4">
+                            (1) See "Management's Discussion and Analysis of Financial
+                            Condition and Results of Operations" for a description of the
+                            items affecting our financial performance.
+                          </p>
+                        </div>
+                      )}
             
             <div className="page-break"></div>
             <div className="my-12">

@@ -8,7 +8,7 @@ export function ProspectusGeneratorDemo() {
   const [selectedTemplate, setSelectedTemplate] = useState('standard');
   const [expandedSection, setExpandedSection] = useState('businessOverview');
   const [showSECPreview, setShowSECPreview] = useState(false);
-  const [financialData, setFinancialData] = useState<FinancialData | null>(null);
+  const [financialData, setFinancialData] = useState<FinancialData[]>([]);
   const handleStepChange = step => {
     setActiveStep(step);
   };
@@ -22,7 +22,7 @@ export function ProspectusGeneratorDemo() {
     setShowSECPreview(!showSECPreview);
   };
   const handleFinancialDataParsed = (data: FinancialData) => {
-    setFinancialData(data);
+    setFinancialData(prev => [...prev, data]);
   };
   const resetFinancialData = () => {
     setFinancialData(null);

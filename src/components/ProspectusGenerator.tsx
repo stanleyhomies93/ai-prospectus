@@ -9,7 +9,7 @@ export function ProspectusGenerator() {
   const [selectedTemplate, setSelectedTemplate] = useState('standard');
   const [expandedSection, setExpandedSection] = useState('businessOverview');
   const [showSECPreview, setShowSECPreview] = useState(false);
-  const [financialData, setFinancialData] = useState<FinancialData | null>(null);
+  const [financialData, setFinancialData] = useState<FinancialData[]>([]);
   const [showSidebar, setShowSidebar] = useState(true);
   const [showPresentationPreview, setShowPresentationPreview] = useState(false);
   const [isProcessComplete, setIsProcessComplete] = useState(false);
@@ -111,10 +111,15 @@ export function ProspectusGenerator() {
     setShowSECPreview(false);
   };
   const handleFinancialDataParsed = (data: FinancialData) => {
-    setFinancialData(data);
+    setFinancialData(prev => [...prev, data]);
   };
+  
   const resetFinancialData = () => {
-    setFinancialData(null);
+    setFinancialData([]);
+  };
+  
+  const removeFinancialData = (index: number) => {
+    setFinancialData(prev => prev.filter((_, i) => i !== index));
   };
   
   const handleCompleteProcess = () => {
@@ -1265,19 +1270,43 @@ export function ProspectusGenerator() {
                           Upload Financial Data
                         </h3>
                         <p className="text-gray-600 mb-4">
-                          Upload your financial statements, balance sheets, income statements, 
-                          and other financial documents. We'll automatically parse and format 
-                          this data for your prospectus.
+                          Upload multiple financial statements, balance sheets, income statements, 
+                          and other financial documents. Each document will be added as a separate 
+                          section in your prospectus.
                         </p>
                         <FinancialDataUploader onDataParsed={handleFinancialDataParsed} />
                       </div>
                       
-                      {financialData && (
+                      {financialData.length > 0 && (
                         <div className="mt-6">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                            Financial Data Preview
-                          </h3>
-                          <FinancialDataPreview data={financialData} onReset={resetFinancialData} />
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              Financial Data Preview ({financialData.length} document{financialData.length !== 1 ? 's' : ''})
+                            </h3>
+                            <button 
+                              onClick={resetFinancialData}
+                              className="text-sm text-red-600 hover:text-red-800 flex items-center"
+                            >
+                              <XIcon size={16} className="mr-1" />
+                              Clear All
+                            </button>
+                          </div>
+                          <div className="space-y-6">
+                            {financialData.map((data, index) => (
+                              <div key={index} className="relative">
+                                <div className="absolute top-2 right-2 z-10">
+                                  <button
+                                    onClick={() => removeFinancialData(index)}
+                                    className="p-1 bg-red-100 text-red-600 rounded-full hover:bg-red-200"
+                                    title="Remove this document"
+                                  >
+                                    <XIcon size={16} />
+                                  </button>
+                                </div>
+                                <FinancialDataPreview data={data} />
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>

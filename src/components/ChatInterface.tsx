@@ -21,7 +21,7 @@ export function ChatInterface() {
   const [showTemplateOptions, setShowTemplateOptions] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [currentSection, setCurrentSection] = useState('');
-  const [financialData, setFinancialData] = useState<FinancialData | null>(null);
+  const [financialData, setFinancialData] = useState<FinancialData[]>([]);
   const [showFileUploader, setShowFileUploader] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [isSectionComplete, setIsSectionComplete] = useState({
