@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { FileTextIcon, CheckIcon, PlusIcon, EditIcon, EyeIcon, DownloadIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon, ClipboardCheckIcon, PanelLeftIcon, PanelRightIcon, LayoutTemplateIcon, ExternalLinkIcon, FileSpreadsheetIcon, TableIcon, ChevronDownIcon, ChevronRightIcon, SaveIcon, FolderIcon, FileIcon, SearchIcon, SettingsIcon, AlertTriangleIcon, TrashIcon, PresentationIcon, MonitorIcon, ChevronsRightIcon, UploadIcon, GlobeIcon, LinkIcon, BuildingIcon, BriefcaseIcon, InfoIcon, BotIcon, ZapIcon, RefreshCwIcon, CreditCardIcon, DollarSignIcon, BarChartIcon, ShoppingCartIcon } from 'lucide-react';
+import { FileTextIcon, CheckIcon, PlusIcon, EditIcon, EyeIcon, DownloadIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon, ClipboardCheckIcon, PanelLeftIcon, PanelRightIcon, LayoutTemplateIcon, ExternalLinkIcon, FileSpreadsheetIcon, TableIcon, ChevronDownIcon, ChevronRightIcon, SaveIcon, FolderIcon, FileIcon, SearchIcon, SettingsIcon, AlertTriangleIcon, TrashIcon, PresentationIcon, MonitorIcon, ChevronsRightIcon, UploadIcon, GlobeIcon, LinkIcon, BuildingIcon, BriefcaseIcon, InfoIcon, BotIcon, ZapIcon, RefreshCwIcon, CreditCardIcon, DollarSignIcon, BarChartIcon, ShoppingCartIcon, UserIcon } from 'lucide-react';
 import { SECDocumentPreview } from './SECDocumentPreview';
 import { FinancialDataUploader, FinancialData } from './FinancialDataUploader';
 import { FinancialDataPreview } from './FinancialDataPreview';
@@ -14,26 +14,72 @@ export function ProspectusGenerator() {
   const [showPresentationPreview, setShowPresentationPreview] = useState(false);
   const [isProcessComplete, setIsProcessComplete] = useState(false);
   const [riskFactors, setRiskFactors] = useState([{
-    title: 'Competitive Market Risk',
-    description: 'We operate in a highly competitive market with numerous established competitors who may have greater resources than us.'
+    title: 'Dependence on Brand License',
+    description: 'We depend on our license from our related company to use the brand name for our business operations. Any termination or modification of this license could materially adversely affect our business and results of operations.'
   }, {
-    title: 'Technology Risk',
-    description: 'Our business depends on the continued functionality and security of our technology platform. Any significant disruption or breach could harm our operations and reputation.'
+    title: 'Competition in English Education Market',
+    description: 'The English language education market in Hong Kong is highly competitive. We compete with numerous established English language schools and tutoring centers, some of which may have greater financial resources and brand recognition than us.'
   }, {
-    title: 'Regulatory Risk',
-    description: 'We are subject to complex and evolving regulations. Changes in these regulations or failure to comply could adversely affect our business.'
+    title: 'Regulatory Changes in Education Sector',
+    description: 'We are subject to regulations governing private education providers in Hong Kong. Changes in education policies or regulations could require us to modify our operations or incur additional compliance costs.'
+  }, {
+    title: 'Franchise Model Risks',
+    description: 'Our business model relies on franchise agreements with our related company. Any disputes, changes in franchise terms, or termination of these agreements could adversely impact our operations.'
+  }, {
+    title: 'Limited Geographic Diversification',
+    description: 'Our operations are concentrated in Hong Kong, making us susceptible to local economic conditions, regulatory changes, and market dynamics specific to Hong Kong.'
+  }, {
+    title: 'Key Personnel Dependence',
+    description: 'Our success depends on our ability to attract, retain and motivate qualified teaching staff and management personnel. The loss of key personnel could adversely affect our business operations.'
+  }, {
+    title: 'Economic Sensitivity',
+    description: 'Demand for our English education services may be affected by economic downturns, as families may reduce discretionary spending on supplemental education during difficult economic times.'
+  }, {
+    title: 'Technology and Online Learning Competition',
+    description: 'The increasing adoption of online learning platforms and educational technology could reduce demand for traditional in-person English language courses.'
   }]);
   const [newRiskTitle, setNewRiskTitle] = useState('');
   const [newRiskDescription, setNewRiskDescription] = useState('');
-  const [companyInfoMethod, setCompanyInfoMethod] = useState<'manual' | 'ai' | null>(null);
-  const [companyWebsite, setCompanyWebsite] = useState('');
-  const [companyName, setCompanyName] = useState('TechFin Solutions');
-  const [companyDescription, setCompanyDescription] = useState('');
+  const [companyInfoMethod, setCompanyInfoMethod] = useState<'manual' | 'ai' | null>('manual');
+  const [companyWebsite, setCompanyWebsite] = useState('www.englishlearning.hk');
+  const [companyName, setCompanyName] = useState('English Learning Academy Ltd.');
+  const [companyDescription, setCompanyDescription] = useState('We are a leading English language education provider in Hong Kong, specializing in English courses for children. We operate through a well-established brand and offer our courses through various learning centers operated by our Hong Kong subsidiaries. Our mission is to provide high-quality English language education to children in Hong Kong through our comprehensive curriculum and experienced teaching staff.');
+  // NEW FIELDS for SEC filing requirements
+  const [companyAddress, setCompanyAddress] = useState('Units 1501-1503, 15/F\nTower 1, Admiralty Centre\n18 Harcourt Road, Admiralty\nHong Kong');
+  const [companyPhone, setCompanyPhone] = useState('+852 2123-4567');
+  const [tickerSymbol, setTickerSymbol] = useState('ELAN');
+  const [filingDate, setFilingDate] = useState('2024-01-15');
+  const [auditor, setAuditor] = useState('Deloitte Touche Tohmatsu');
+  const [usProcessAgent, setUsProcessAgent] = useState('Corporation Service Company');
+  const [usProcessAgentAddress, setUsProcessAgentAddress] = useState('251 Little Falls Drive\nWilmington, DE 19808\nUnited States');
+  const [usProcessAgentPhone, setUsProcessAgentPhone] = useState('+1 (302) 636-5400');
+  const [legalCounsel, setLegalCounsel] = useState('Michael Chen, Esq.');
+  const [usLawFirm, setUsLawFirm] = useState('Skadden, Arps, Slate, Meagher & Flom LLP');
+  const [usLawFirmAddress, setUsLawFirmAddress] = useState('One Manhattan West\nNew York, NY 10001\nUnited States');
+  const [usLawFirmPhone, setUsLawFirmPhone] = useState('+1 (212) 735-3000');
+  const [underwritingCounsel, setUnderwritingCounsel] = useState('Davis Polk & Wardwell LLP');
+  const [underwritingCounselAddress, setUnderwritingCounselAddress] = useState('450 Lexington Avenue\nNew York, NY 10017\nUnited States');
+  const [underwritingCounselPhone, setUnderwritingCounselPhone] = useState('+1 (212) 450-4000');
+  const [ceoName, setCeoName] = useState('David Wong');
+  const [relatedCompany, setRelatedCompany] = useState('English Learning Holdings Ltd.');
   const [companyDeckUploaded, setCompanyDeckUploaded] = useState(false);
   const [additionalResources, setAdditionalResources] = useState<Array<{
     url: string;
     addedAt: Date;
-  }>>([]);
+  }>>([
+    {
+      url: 'https://www.englishlearning.hk/about-us',
+      addedAt: new Date()
+    },
+    {
+      url: 'https://www.englishlearning.hk/our-programs',
+      addedAt: new Date()
+    },
+    {
+      url: 'https://www.englishlearning.hk/investor-relations',
+      addedAt: new Date()
+    }
+  ]);
   const [resourceInputs, setResourceInputs] = useState<Array<{
     id: string;
     value: string;
@@ -359,7 +405,27 @@ export function ProspectusGenerator() {
                   Return to Editor
                 </button>
               </div>
-              <SECDocumentPreview financialData={financialData} />
+              <SECDocumentPreview 
+                financialData={financialData}
+                companyName={companyName}
+                companyAddress={companyAddress}
+                companyPhone={companyPhone}
+                tickerSymbol={tickerSymbol}
+                filingDate={filingDate}
+                auditor={auditor}
+                usProcessAgent={usProcessAgent}
+                usProcessAgentAddress={usProcessAgentAddress}
+                usProcessAgentPhone={usProcessAgentPhone}
+                legalCounsel={legalCounsel}
+                usLawFirm={usLawFirm}
+                usLawFirmAddress={usLawFirmAddress}
+                usLawFirmPhone={usLawFirmPhone}
+                underwritingCounsel={underwritingCounsel}
+                underwritingCounselAddress={underwritingCounselAddress}
+                underwritingCounselPhone={underwritingCounselPhone}
+                ceoName={ceoName}
+                relatedCompany={relatedCompany}
+              />
             </div> : showPresentationPreview ? <div className="p-6">
               <div className="mb-6 flex justify-between items-center">
                 <h2 className="text-xl font-semibold text-gray-900">
@@ -425,32 +491,162 @@ export function ProspectusGenerator() {
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Left Column - Manual Company Information */}
                         <div className="space-y-6">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Company Name
-                            </label>
-                            <input type="text" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., TechFin Solutions, Inc." value={companyName} onChange={e => setCompanyName(e.target.value)} />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Company Website
-                            </label>
-                            <div className="flex">
-                              <div className="flex items-center bg-gray-100 border border-gray-300 rounded-l-md px-3">
-                                <GlobeIcon size={16} className="text-gray-500" />
+                          {/* Basic Company Information */}
+                          <div className="border-b border-gray-200 pb-4">
+                            <h4 className="text-md font-semibold text-gray-800 mb-3 flex items-center">
+                              <BuildingIcon size={18} className="mr-2 text-blue-700" />
+                              Basic Company Information
+                            </h4>
+                            <div className="space-y-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Company Name *
+                                </label>
+                                <input type="text" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., TechFin Solutions, Inc." value={companyName} onChange={e => setCompanyName(e.target.value)} />
                               </div>
-                              <input type="text" className="w-full p-2 border border-gray-300 border-l-0 rounded-r-md focus:ring-blue-500 focus:border-blue-500" placeholder="www.techfinsolutions.com" value={companyWebsite} onChange={e => setCompanyWebsite(e.target.value)} />
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Company Address *
+                                </label>
+                                <textarea className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" rows={2} placeholder="Full company address including city, state, and zip code" value={companyAddress} onChange={e => setCompanyAddress(e.target.value)}></textarea>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Company Phone *
+                                </label>
+                                <input type="tel" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="+1 (555) 123-4567" value={companyPhone} onChange={e => setCompanyPhone(e.target.value)} />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Stock Ticker Symbol *
+                                </label>
+                                <input type="text" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., TFIN" value={tickerSymbol} onChange={e => setTickerSymbol(e.target.value)} />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Filing Date *
+                                </label>
+                                <input type="date" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" value={filingDate} onChange={e => setFilingDate(e.target.value)} />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Company Website
+                                </label>
+                                <div className="flex">
+                                  <div className="flex items-center bg-gray-100 border border-gray-300 rounded-l-md px-3">
+                                    <GlobeIcon size={16} className="text-gray-500" />
+                                  </div>
+                                  <input type="text" className="w-full p-2 border border-gray-300 border-l-0 rounded-r-md focus:ring-blue-500 focus:border-blue-500" placeholder="www.techfinsolutions.com" value={companyWebsite} onChange={e => setCompanyWebsite(e.target.value)} />
+                                </div>
+                                <p className="mt-1 text-sm text-gray-500">
+                                  We'll analyze your website to gather information about your business.
+                                </p>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Company Description
+                                </label>
+                                <textarea className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" rows={4} placeholder="Describe your company's business model, products/services, and target market..." value={companyDescription} onChange={e => setCompanyDescription(e.target.value)}></textarea>
+                              </div>
                             </div>
-                            <p className="mt-1 text-sm text-gray-500">
-                              We'll analyze your website to gather information
-                              about your business.
-                            </p>
                           </div>
+
+                          {/* Legal & Professional Services */}
+                          <div className="border-b border-gray-200 pb-4">
+                            <h4 className="text-md font-semibold text-gray-800 mb-3 flex items-center">
+                              <BriefcaseIcon size={18} className="mr-2 text-blue-700" />
+                              Legal & Professional Services
+                            </h4>
+                            <div className="space-y-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Audit Firm *
+                                </label>
+                                <input type="text" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Deloitte & Touche LLP" value={auditor} onChange={e => setAuditor(e.target.value)} />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  US Process Agent *
+                                </label>
+                                <input type="text" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Corporation Service Company" value={usProcessAgent} onChange={e => setUsProcessAgent(e.target.value)} />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Process Agent Address *
+                                </label>
+                                <textarea className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" rows={2} placeholder="Full address of US process agent" value={usProcessAgentAddress} onChange={e => setUsProcessAgentAddress(e.target.value)}></textarea>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Process Agent Phone *
+                                </label>
+                                <input type="tel" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="+1 (555) 123-4567" value={usProcessAgentPhone} onChange={e => setUsProcessAgentPhone(e.target.value)} />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Legal Counsel Name *
+                                </label>
+                                <input type="text" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., John Smith, Esq." value={legalCounsel} onChange={e => setLegalCounsel(e.target.value)} />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  US Law Firm *
+                                </label>
+                                <input type="text" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Skadden, Arps, Slate, Meagher & Flom LLP" value={usLawFirm} onChange={e => setUsLawFirm(e.target.value)} />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  US Law Firm Address *
+                                </label>
+                                <textarea className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" rows={2} placeholder="Full address of US law firm" value={usLawFirmAddress} onChange={e => setUsLawFirmAddress(e.target.value)}></textarea>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  US Law Firm Phone *
+                                </label>
+                                <input type="tel" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="+1 (555) 123-4567" value={usLawFirmPhone} onChange={e => setUsLawFirmPhone(e.target.value)} />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Underwriting Counsel *
+                                </label>
+                                <input type="text" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Davis Polk & Wardwell LLP" value={underwritingCounsel} onChange={e => setUnderwritingCounsel(e.target.value)} />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Underwriting Counsel Address *
+                                </label>
+                                <textarea className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" rows={2} placeholder="Full address of underwriting counsel" value={underwritingCounselAddress} onChange={e => setUnderwritingCounselAddress(e.target.value)}></textarea>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Underwriting Counsel Phone *
+                                </label>
+                                <input type="tel" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="+1 (555) 123-4567" value={underwritingCounselPhone} onChange={e => setUnderwritingCounselPhone(e.target.value)} />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Management & Related Companies */}
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Company Description
-                            </label>
-                            <textarea className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" rows={4} placeholder="Describe your company's business model, products/services, and target market..." value={companyDescription} onChange={e => setCompanyDescription(e.target.value)}></textarea>
+                            <h4 className="text-md font-semibold text-gray-800 mb-3 flex items-center">
+                              <UserIcon size={18} className="mr-2 text-blue-700" />
+                              Management & Related Companies
+                            </h4>
+                            <div className="space-y-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  CEO/Controlling Shareholder Name *
+                                </label>
+                                <input type="text" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., John Smith" value={ceoName} onChange={e => setCeoName(e.target.value)} />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Related Company Name
+                                </label>
+                                <input type="text" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Parent company or related entity" value={relatedCompany} onChange={e => setRelatedCompany(e.target.value)} />
+                              </div>
+                            </div>
                           </div>
                         </div>
 
