@@ -13,11 +13,13 @@ export interface FinancialData {
 interface FinancialDataUploaderProps {
   onDataParsed: (data: FinancialData) => void;
   onReset?: () => void;
+  uploadedCount?: number;
 }
 
 export function FinancialDataUploader({
   onDataParsed,
-  onReset
+  onReset,
+  uploadedCount = 0
 }: FinancialDataUploaderProps) {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -162,14 +164,42 @@ export function FinancialDataUploader({
     if (onReset) onReset();
   };
 
+  const handleContinueUploading = () => {
+    setSuccess(false);
+    setFile(null);
+    setError(null);
+    setSheetNames([]);
+    setSelectedSheet('');
+    // Keep the current document type selected for convenience
+  };
+
+  const handleUploadAnother = () => {
+    setSuccess(false);
+    setFile(null);
+    setError(null);
+    setSheetNames([]);
+    setSelectedSheet('');
+    // Reset to general type for a fresh start
+    setDocumentType('general');
+    setDataTitle('Financial Statements');
+    setDataPeriod('For the years ended December 31, 2022, 2021, and 2020');
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
-        Upload Financial Data
-      </h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-900">
+          Upload Financial Data
+        </h3>
+        {uploadedCount > 0 && (
+          <div className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+            {uploadedCount} document{uploadedCount !== 1 ? 's' : ''} uploaded
+          </div>
+        )}
+      </div>
       
       {success ? (
-        <div className="mb-4">
+        <div className="mb-6">
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start">
             <CheckCircleIcon size={20} className="text-green-500 mt-0.5 mr-3 flex-shrink-0" />
             <div>
@@ -182,11 +212,29 @@ export function FinancialDataUploader({
               </p>
             </div>
           </div>
-          <div className="mt-4 flex justify-between">
-            <button onClick={handleReset} className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 flex items-center">
-              <XIcon size={16} className="mr-2" />
-              Reset
-            </button>
+          <div className="mt-4 space-y-3">
+            <div className="flex gap-3">
+              <button 
+                onClick={handleContinueUploading}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center justify-center"
+              >
+                <PlusIcon size={16} className="mr-2" />
+                Upload Another {documentTypeOptions.find(opt => opt.value === documentType)?.label}
+              </button>
+              <button 
+                onClick={handleUploadAnother}
+                className="flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center justify-center"
+              >
+                <PlusIcon size={16} className="mr-2" />
+                Upload Different Document Type
+              </button>
+            </div>
+            <div className="flex justify-center">
+              <button onClick={handleReset} className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 flex items-center">
+                <XIcon size={16} className="mr-2" />
+                Reset All
+              </button>
+            </div>
           </div>
         </div>
       ) : (

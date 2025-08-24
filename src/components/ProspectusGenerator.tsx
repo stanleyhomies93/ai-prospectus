@@ -1280,7 +1280,25 @@ export function ProspectusGenerator() {
                           and other financial documents. Each document will be added as a separate 
                           section in your prospectus.
                         </p>
-                        <FinancialDataUploader onDataParsed={handleFinancialDataParsed} />
+                        {financialData.length > 0 && (
+                          <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                            <p className="text-sm text-blue-800">
+                              <strong>Tip:</strong> You've uploaded {financialData.length} document{financialData.length !== 1 ? 's' : ''}. 
+                              Consider uploading different document types to create a comprehensive financial section:
+                            </p>
+                            <ul className="text-xs text-blue-700 mt-2 space-y-1">
+                              {financialData.length === 1 && <li>• <strong>Income Statement</strong> - for revenue and profitability data</li>}
+                              {financialData.length === 1 && <li>• <strong>Balance Sheet</strong> - for assets and liabilities</li>}
+                              {financialData.length === 1 && <li>• <strong>Cash Flow Statement</strong> - for cash flow analysis</li>}
+                              {financialData.length >= 2 && <li>• <strong>Liquidity & Capital Resources</strong> - for working capital analysis</li>}
+                              {financialData.length >= 2 && <li>• <strong>Additional financial metrics</strong> - for comprehensive coverage</li>}
+                            </ul>
+                          </div>
+                        )}
+                        <FinancialDataUploader 
+                          onDataParsed={handleFinancialDataParsed} 
+                          uploadedCount={financialData.length}
+                        />
                       </div>
                       
                       {financialData.length > 0 && (
