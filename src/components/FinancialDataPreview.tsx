@@ -12,8 +12,10 @@ export function FinancialDataPreview({
   onReset
 }: FinancialDataPreviewProps) {
   try {
-  // Add debugging and better error handling
-  console.log('FinancialDataPreview received data:', data);
+  // Only log if there's an issue with the data
+  if (!data || !data.headers || !data.rows) {
+    console.log('FinancialDataPreview received incomplete data:', data);
+  }
   
   if (!data) {
     console.log('No data provided to FinancialDataPreview');
@@ -24,8 +26,7 @@ export function FinancialDataPreview({
     );
   }
   
-  if (!data.headers || !Array.isArray(data.headers) || data.headers.length === 0) {
-    console.log('No headers in financial data');
+  if (!data.headers || !Array.isArray(data.headers)) {
     return (
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <p className="text-gray-500">Invalid financial data format: missing headers</p>
@@ -33,8 +34,7 @@ export function FinancialDataPreview({
     );
   }
   
-  if (!data.rows || !Array.isArray(data.rows) || data.rows.length === 0) {
-    console.log('No rows in financial data');
+  if (!data.rows || !Array.isArray(data.rows)) {
     return (
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <p className="text-gray-500">Invalid financial data format: missing data rows</p>
@@ -101,24 +101,7 @@ export function FinancialDataPreview({
   const IconComponent = getDocumentTypeIcon(data.type);
   const typeColor = getDocumentTypeColor(data.type);
 
-  // Additional safety checks
-  if (!data.headers || !Array.isArray(data.headers)) {
-    console.error('Invalid headers in FinancialDataPreview:', data.headers);
-    return (
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <p className="text-red-600">Error: Invalid data structure - missing headers</p>
-      </div>
-    );
-  }
-
-  if (!data.rows || !Array.isArray(data.rows)) {
-    console.error('Invalid rows in FinancialDataPreview:', data.rows);
-    return (
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <p className="text-red-600">Error: Invalid data structure - missing rows</p>
-      </div>
-    );
-  }
+  // Data is already validated above, proceed with rendering
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -157,41 +140,55 @@ export function FinancialDataPreview({
         <table className="min-w-full border border-gray-300">
           <thead>
             <tr className="bg-gray-100">
-              {data.headers && Array.isArray(data.headers) && data.headers.map((header, index) => (
-                <th 
-                  key={index} 
-                  className={`px-4 py-3 text-left border-b border-r border-gray-300 font-medium text-gray-700 ${
-                    index === 0 ? 'min-w-48' : 'text-right min-w-32'
-                  }`}
-                >
-                  {String(header || '')}
+              {data.headers && Array.isArray(data.headers) && data.headers.length > 0 ? (
+                data.headers.map((header, index) => (
+                  <th 
+                    key={index} 
+                    className={`px-4 py-3 text-left border-b border-r border-gray-300 font-medium text-gray-700 ${
+                      index === 0 ? 'min-w-48' : 'text-right min-w-32'
+                    }`}
+                  >
+                    {String(header || '')}
+                  </th>
+                ))
+              ) : (
+                <th className="px-4 py-3 text-left border-b border-r border-gray-300 font-medium text-gray-700">
+                  No headers available
                 </th>
-              ))}
+              )}
             </tr>
           </thead>
           <tbody>
-            {data.rows && Array.isArray(data.rows) && data.rows.map((row, rowIndex) => {
-              if (!row || !Array.isArray(row)) {
-                console.error('Invalid row at index', rowIndex, ':', row);
-                return null;
-              }
-              return (
-                <tr key={rowIndex} className={getRowStyle(row, rowIndex)}>
-                  {row.map((cell, cellIndex) => (
-                    <td 
-                      key={cellIndex} 
-                      className={`px-4 py-3 border-b border-r border-gray-300 ${
-                        cellIndex === 0 
-                          ? 'font-medium text-gray-900' 
-                          : 'text-right text-gray-700'
-                      }`}
-                    >
-                      {formatValue(cell || '')}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
+            {data.rows && Array.isArray(data.rows) && data.rows.length > 0 ? (
+              data.rows.map((row, rowIndex) => {
+                if (!row || !Array.isArray(row)) {
+                  console.error('Invalid row at index', rowIndex, ':', row);
+                  return null;
+                }
+                return (
+                  <tr key={rowIndex} className={getRowStyle(row, rowIndex)}>
+                    {row.map((cell, cellIndex) => (
+                      <td 
+                        key={cellIndex} 
+                        className={`px-4 py-3 border-b border-r border-gray-300 ${
+                          cellIndex === 0 
+                            ? 'font-medium text-gray-900' 
+                            : 'text-right text-gray-700'
+                        }`}
+                      >
+                        {formatValue(cell || '')}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={data.headers?.length || 1} className="px-4 py-3 text-center text-gray-500">
+                  No data available
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
