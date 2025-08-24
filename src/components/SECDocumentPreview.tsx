@@ -356,6 +356,263 @@ export function SECDocumentPreview({
     return '150,000';
   };
 
+  // Intelligent data summarization functions
+  const generateTableSummary = (doc: FinancialData): JSX.Element => {
+    const summary = analyzeFinancialData(doc);
+    
+    return (
+      <div className="bg-gray-50 border-l-4 border-blue-500 p-4 mb-4 rounded-r">
+        <h4 className="font-semibold text-gray-800 mb-2 flex items-center">
+          📊 Data Analysis Summary: {doc.title}
+        </h4>
+        <div className="text-sm text-gray-700 space-y-1">
+          {summary.map((insight, index) => (
+            <p key={index} className="flex items-start">
+              <span className="text-blue-600 mr-2">•</span>
+              {insight}
+            </p>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const analyzeFinancialData = (doc: FinancialData): string[] => {
+    const insights: string[] = [];
+    
+    if (!doc.rows || doc.rows.length === 0) {
+      return ['No data available for analysis.'];
+    }
+
+    // Analyze document type and generate relevant insights
+    if (doc.type === 'income') {
+      insights.push(...analyzeIncomeStatement(doc));
+    } else if (doc.type === 'balance') {
+      insights.push(...analyzeBalanceSheet(doc));
+    } else if (doc.type === 'liquidity') {
+      insights.push(...analyzeLiquidityData(doc));
+    } else {
+      insights.push(...analyzeGeneralFinancialData(doc));
+    }
+
+    return insights;
+  };
+
+  const analyzeIncomeStatement = (doc: FinancialData): string[] => {
+    const insights: string[] = [];
+    
+    try {
+      // Find revenue and profit/loss data
+      const revenueRow = doc.rows.find(row => 
+        row[0] && String(row[0]).toLowerCase().includes('revenue') || 
+        String(row[0]).toLowerCase().includes('sales')
+      );
+      
+      const profitRow = doc.rows.find(row => 
+        row[0] && (String(row[0]).toLowerCase().includes('net income') || 
+                  String(row[0]).toLowerCase().includes('net loss') ||
+                  String(row[0]).toLowerCase().includes('profit'))
+      );
+
+      if (revenueRow && revenueRow.length > 1) {
+        const currentRevenue = typeof revenueRow[1] === 'number' ? revenueRow[1] : 0;
+        const previousRevenue = typeof revenueRow[2] === 'number' ? revenueRow[2] : 0;
+        
+        if (previousRevenue > 0) {
+          const growthRate = ((currentRevenue - previousRevenue) / previousRevenue) * 100;
+          if (growthRate > 0) {
+            insights.push(`Revenue increased by ${growthRate.toFixed(1)}% from ${formatCurrency(previousRevenue)} to ${formatCurrency(currentRevenue)}.`);
+          } else {
+            insights.push(`Revenue decreased by ${Math.abs(growthRate).toFixed(1)}% from ${formatCurrency(previousRevenue)} to ${formatCurrency(currentRevenue)}.`);
+          }
+        } else {
+          insights.push(`Current revenue stands at ${formatCurrency(currentRevenue)}.`);
+        }
+      }
+
+      if (profitRow && profitRow.length > 1) {
+        const currentProfit = typeof profitRow[1] === 'number' ? profitRow[1] : 0;
+        const previousProfit = typeof profitRow[2] === 'number' ? profitRow[2] : 0;
+        
+        if (currentProfit > 0) {
+          insights.push(`Net income of ${formatCurrency(currentProfit)} demonstrates positive profitability.`);
+        } else {
+          insights.push(`Net loss of ${formatCurrency(Math.abs(currentProfit))} indicates current period challenges.`);
+        }
+        
+        if (previousProfit !== 0) {
+          const profitChange = ((currentProfit - previousProfit) / Math.abs(previousProfit)) * 100;
+          if (profitChange > 0) {
+            insights.push(`Profitability improved by ${profitChange.toFixed(1)}% compared to the previous period.`);
+          } else {
+            insights.push(`Profitability declined by ${Math.abs(profitChange).toFixed(1)}% compared to the previous period.`);
+          }
+        }
+      }
+
+      // Analyze expense trends
+      const expenseRows = doc.rows.filter(row => 
+        row[0] && (String(row[0]).toLowerCase().includes('expense') || 
+                  String(row[0]).toLowerCase().includes('cost'))
+      );
+
+      if (expenseRows.length > 0) {
+        const totalExpenses = expenseRows.reduce((sum, row) => {
+          const value = typeof row[1] === 'number' ? row[1] : 0;
+          return sum + value;
+        }, 0);
+        
+        insights.push(`Total operating expenses amount to ${formatCurrency(totalExpenses)}.`);
+      }
+
+    } catch (error) {
+      insights.push('Unable to analyze income statement data due to format variations.');
+    }
+
+    return insights;
+  };
+
+  const analyzeBalanceSheet = (doc: FinancialData): string[] => {
+    const insights: string[] = [];
+    
+    try {
+      // Find key balance sheet items
+      const totalAssetsRow = doc.rows.find(row => 
+        row[0] && String(row[0]).toLowerCase().includes('total assets')
+      );
+      
+      const totalLiabilitiesRow = doc.rows.find(row => 
+        row[0] && String(row[0]).toLowerCase().includes('total liabilities')
+      );
+      
+      const cashRow = doc.rows.find(row => 
+        row[0] && String(row[0]).toLowerCase().includes('cash')
+      );
+
+      if (totalAssetsRow && totalAssetsRow.length > 1) {
+        const totalAssets = typeof totalAssetsRow[1] === 'number' ? totalAssetsRow[1] : 0;
+        insights.push(`Total assets of ${formatCurrency(totalAssets)} represent the company's resource base.`);
+      }
+
+      if (totalLiabilitiesRow && totalLiabilitiesRow.length > 1) {
+        const totalLiabilities = typeof totalLiabilitiesRow[1] === 'number' ? totalLiabilitiesRow[1] : 0;
+        insights.push(`Total liabilities of ${formatCurrency(totalLiabilities)} represent outstanding obligations.`);
+      }
+
+      if (totalAssetsRow && totalLiabilitiesRow && totalAssetsRow.length > 1 && totalLiabilitiesRow.length > 1) {
+        const totalAssets = typeof totalAssetsRow[1] === 'number' ? totalAssetsRow[1] : 0;
+        const totalLiabilities = typeof totalLiabilitiesRow[1] === 'number' ? totalLiabilitiesRow[1] : 0;
+        
+        if (totalAssets > 0) {
+          const debtRatio = (totalLiabilities / totalAssets) * 100;
+          insights.push(`Debt-to-asset ratio of ${debtRatio.toFixed(1)}% indicates ${debtRatio > 50 ? 'high' : 'moderate'} leverage.`);
+        }
+      }
+
+      if (cashRow && cashRow.length > 1) {
+        const cashBalance = typeof cashRow[1] === 'number' ? cashRow[1] : 0;
+        insights.push(`Cash and cash equivalents of ${formatCurrency(cashBalance)} provide liquidity for operations.`);
+      }
+
+    } catch (error) {
+      insights.push('Unable to analyze balance sheet data due to format variations.');
+    }
+
+    return insights;
+  };
+
+  const analyzeLiquidityData = (doc: FinancialData): string[] => {
+    const insights: string[] = [];
+    
+    try {
+      // Find current assets and liabilities
+      const currentAssetsRow = doc.rows.find(row => 
+        row[0] && String(row[0]).toLowerCase().includes('current assets')
+      );
+      
+      const currentLiabilitiesRow = doc.rows.find(row => 
+        row[0] && String(row[0]).toLowerCase().includes('current liabilities')
+      );
+
+      if (currentAssetsRow && currentLiabilitiesRow && currentAssetsRow.length > 1 && currentLiabilitiesRow.length > 1) {
+        const currentAssets = typeof currentAssetsRow[1] === 'number' ? currentAssetsRow[1] : 0;
+        const currentLiabilities = typeof currentLiabilitiesRow[1] === 'number' ? currentLiabilitiesRow[1] : 0;
+        
+        if (currentLiabilities > 0) {
+          const currentRatio = currentAssets / currentLiabilities;
+          insights.push(`Current ratio of ${currentRatio.toFixed(2)} indicates ${currentRatio > 1.5 ? 'strong' : currentRatio > 1 ? 'adequate' : 'weak'} short-term liquidity.`);
+        }
+      }
+
+      // Analyze working capital
+      const workingCapitalRow = doc.rows.find(row => 
+        row[0] && String(row[0]).toLowerCase().includes('working capital') ||
+        String(row[0]).toLowerCase().includes('net current assets')
+      );
+
+      if (workingCapitalRow && workingCapitalRow.length > 1) {
+        const workingCapital = typeof workingCapitalRow[1] === 'number' ? workingCapitalRow[1] : 0;
+        if (workingCapital > 0) {
+          insights.push(`Positive working capital of ${formatCurrency(workingCapital)} supports operational needs.`);
+        } else {
+          insights.push(`Negative working capital of ${formatCurrency(Math.abs(workingCapital))} may indicate liquidity concerns.`);
+        }
+      }
+
+    } catch (error) {
+      insights.push('Unable to analyze liquidity data due to format variations.');
+    }
+
+    return insights;
+  };
+
+  const analyzeGeneralFinancialData = (doc: FinancialData): string[] => {
+    const insights: string[] = [];
+    
+    try {
+      // Analyze trends across columns
+      const numericRows = doc.rows.filter(row => 
+        row.length > 1 && typeof row[1] === 'number'
+      );
+
+      if (numericRows.length > 0) {
+        const totalValues = numericRows.reduce((sum, row) => {
+          const value = typeof row[1] === 'number' ? row[1] : 0;
+          return sum + value;
+        }, 0);
+        
+        insights.push(`Total value across all categories: ${formatCurrency(totalValues)}.`);
+      }
+
+      // Look for significant changes
+      if (doc.rows.length > 0 && doc.rows[0].length > 2) {
+        const firstRow = doc.rows[0];
+        const currentValue = typeof firstRow[1] === 'number' ? firstRow[1] : 0;
+        const previousValue = typeof firstRow[2] === 'number' ? firstRow[2] : 0;
+        
+        if (previousValue > 0) {
+          const changePercent = ((currentValue - previousValue) / previousValue) * 100;
+          insights.push(`Primary metric shows ${changePercent > 0 ? 'increase' : 'decrease'} of ${Math.abs(changePercent).toFixed(1)}%.`);
+        }
+      }
+
+    } catch (error) {
+      insights.push('General financial analysis completed with available data.');
+    }
+
+    return insights;
+  };
+
+  const formatCurrency = (value: number): string => {
+    if (value >= 1000000) {
+      return `$${(value / 1000000).toFixed(1)}M`;
+    } else if (value >= 1000) {
+      return `$${(value / 1000).toFixed(0)}K`;
+    } else {
+      return `$${value.toLocaleString()}`;
+    }
+  };
+
   // Extract common financial figures for use throughout the document
   // Try to get data from specific document types first, then fall back to general data
   const revenue2023 = getFinancialFigure(0, 1, '45.2M', 'income');
@@ -875,6 +1132,9 @@ export function SECDocumentPreview({
                                   })}
                                 </tbody>
                               </table>
+                              
+                              {/* Data Analysis Summary */}
+                              {generateTableSummary(doc)}
                             </div>
                           ))}
                           
