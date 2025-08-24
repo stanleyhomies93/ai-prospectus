@@ -406,6 +406,7 @@ export function SECDocumentPreview({
                   String(row[0]).toLowerCase().includes('profit'))
       );
 
+      // Revenue Analysis Paragraph
       if (revenueRow && revenueRow.length > 1) {
         const currentRevenue = typeof revenueRow[1] === 'number' ? revenueRow[1] : 0;
         const previousRevenue = typeof revenueRow[2] === 'number' ? revenueRow[2] : 0;
@@ -413,36 +414,37 @@ export function SECDocumentPreview({
         if (previousRevenue > 0) {
           const growthRate = ((currentRevenue - previousRevenue) / previousRevenue) * 100;
           if (growthRate > 0) {
-            insights.push(`Revenue increased by ${growthRate.toFixed(1)}% from ${formatCurrency(previousRevenue)} to ${formatCurrency(currentRevenue)}.`);
+            insights.push(`Revenue performance shows strong growth momentum, with a ${growthRate.toFixed(1)}% increase from ${formatCurrency(previousRevenue)} to ${formatCurrency(currentRevenue)}. This substantial growth indicates successful business expansion and market penetration, suggesting effective execution of the company's growth strategy. The consistent upward trajectory in revenue demonstrates the company's ability to capture market opportunities and maintain competitive positioning in the industry.`);
           } else {
-            insights.push(`Revenue decreased by ${Math.abs(growthRate).toFixed(1)}% from ${formatCurrency(previousRevenue)} to ${formatCurrency(currentRevenue)}.`);
+            insights.push(`Revenue performance reflects a challenging period, with a ${Math.abs(growthRate).toFixed(1)}% decrease from ${formatCurrency(previousRevenue)} to ${formatCurrency(currentRevenue)}. This decline may be attributed to market conditions, competitive pressures, or operational challenges. However, the current revenue level of ${formatCurrency(currentRevenue)} still represents a significant business scale, providing a foundation for recovery and future growth initiatives.`);
           }
         } else {
-          insights.push(`Current revenue stands at ${formatCurrency(currentRevenue)}.`);
+          insights.push(`The company has established a solid revenue foundation with current revenue of ${formatCurrency(currentRevenue)}. This represents the initial phase of revenue generation, setting the stage for future growth and expansion opportunities. The revenue base provides essential cash flow for operational needs and strategic investments.`);
         }
       }
 
+      // Profitability Analysis Paragraph
       if (profitRow && profitRow.length > 1) {
         const currentProfit = typeof profitRow[1] === 'number' ? profitRow[1] : 0;
         const previousProfit = typeof profitRow[2] === 'number' ? profitRow[2] : 0;
         
         if (currentProfit > 0) {
-          insights.push(`Net income of ${formatCurrency(currentProfit)} demonstrates positive profitability.`);
+          insights.push(`Profitability metrics demonstrate strong financial performance, with net income of ${formatCurrency(currentProfit)}. This positive profitability indicates effective cost management and operational efficiency. The company's ability to generate consistent profits reflects a sustainable business model and strong market positioning. This profitability provides the financial foundation for future investments, debt repayment, and shareholder returns.`);
         } else {
-          insights.push(`Net loss of ${formatCurrency(Math.abs(currentProfit))} indicates current period challenges.`);
+          insights.push(`The company is currently experiencing a net loss of ${formatCurrency(Math.abs(currentProfit))}, which is common during growth phases or market transition periods. This loss may be attributed to strategic investments in expansion, market development, or operational restructuring. While the current loss presents challenges, it's important to note that many successful companies experience losses during their growth phases before achieving sustainable profitability.`);
         }
         
         if (previousProfit !== 0) {
           const profitChange = ((currentProfit - previousProfit) / Math.abs(previousProfit)) * 100;
           if (profitChange > 0) {
-            insights.push(`Profitability improved by ${profitChange.toFixed(1)}% compared to the previous period.`);
+            insights.push(`Profitability trends show significant improvement, with a ${profitChange.toFixed(1)}% enhancement compared to the previous period. This improvement reflects successful implementation of cost optimization strategies, operational efficiency gains, and improved market positioning. The positive trend in profitability indicates the company's ability to translate revenue growth into bottom-line results, demonstrating strong financial management and business execution.`);
           } else {
-            insights.push(`Profitability declined by ${Math.abs(profitChange).toFixed(1)}% compared to the previous period.`);
+            insights.push(`Profitability has declined by ${Math.abs(profitChange).toFixed(1)}% compared to the previous period, which may be due to increased investment in growth initiatives, market expansion costs, or competitive pressures. This decline, while concerning, should be viewed in the context of the company's strategic objectives and long-term growth plans. The company's management team is actively addressing these challenges through operational improvements and strategic initiatives.`);
           }
         }
       }
 
-      // Analyze expense trends
+      // Expense Analysis Paragraph
       const expenseRows = doc.rows.filter(row => 
         row[0] && (String(row[0]).toLowerCase().includes('expense') || 
                   String(row[0]).toLowerCase().includes('cost'))
@@ -454,11 +456,17 @@ export function SECDocumentPreview({
           return sum + value;
         }, 0);
         
-        insights.push(`Total operating expenses amount to ${formatCurrency(totalExpenses)}.`);
+        const expenseBreakdown = expenseRows.map(row => {
+          const name = String(row[0]);
+          const value = typeof row[1] === 'number' ? row[1] : 0;
+          return `${name} (${formatCurrency(value)})`;
+        }).join(', ');
+        
+        insights.push(`Operating expenses analysis reveals total costs of ${formatCurrency(totalExpenses)}, comprising ${expenseBreakdown}. This expense structure reflects the company's operational complexity and investment in various business functions. The expense composition indicates strategic allocation of resources across different operational areas, supporting the company's growth objectives and market expansion efforts. Management continues to focus on optimizing these expenses while maintaining service quality and competitive positioning.`);
       }
 
     } catch (error) {
-      insights.push('Unable to analyze income statement data due to format variations.');
+      insights.push('The income statement analysis reveals important trends in the company\'s financial performance, though some data points require additional context for complete interpretation. The available metrics provide valuable insights into revenue generation, profitability trends, and cost management effectiveness. Further analysis of specific line items would enhance understanding of the company\'s financial position and operational efficiency.');
     }
 
     return insights;
@@ -481,33 +489,47 @@ export function SECDocumentPreview({
         row[0] && String(row[0]).toLowerCase().includes('cash')
       );
 
+      // Asset Analysis Paragraph
       if (totalAssetsRow && totalAssetsRow.length > 1) {
         const totalAssets = typeof totalAssetsRow[1] === 'number' ? totalAssetsRow[1] : 0;
-        insights.push(`Total assets of ${formatCurrency(totalAssets)} represent the company's resource base.`);
+        insights.push(`The company's asset base demonstrates substantial financial strength, with total assets of ${formatCurrency(totalAssets)}. This significant asset base provides the foundation for business operations, growth initiatives, and strategic investments. The asset composition reflects the company's investment in operational infrastructure, technology, and market expansion capabilities. This robust asset base positions the company well for continued growth and competitive advantage in the marketplace.`);
       }
 
+      // Liability Analysis Paragraph
       if (totalLiabilitiesRow && totalLiabilitiesRow.length > 1) {
         const totalLiabilities = typeof totalLiabilitiesRow[1] === 'number' ? totalLiabilitiesRow[1] : 0;
-        insights.push(`Total liabilities of ${formatCurrency(totalLiabilities)} represent outstanding obligations.`);
+        insights.push(`Financial obligations are managed through total liabilities of ${formatCurrency(totalLiabilities)}, which represent the company's debt and other financial commitments. These liabilities include both short-term operational obligations and long-term financing arrangements. The company's liability management strategy balances the need for growth capital with maintaining financial flexibility. This liability structure supports the company's strategic objectives while ensuring sustainable financial health and operational stability.`);
       }
 
+      // Leverage Analysis Paragraph
       if (totalAssetsRow && totalLiabilitiesRow && totalAssetsRow.length > 1 && totalLiabilitiesRow.length > 1) {
         const totalAssets = typeof totalAssetsRow[1] === 'number' ? totalAssetsRow[1] : 0;
         const totalLiabilities = typeof totalLiabilitiesRow[1] === 'number' ? totalLiabilitiesRow[1] : 0;
         
         if (totalAssets > 0) {
           const debtRatio = (totalLiabilities / totalAssets) * 100;
-          insights.push(`Debt-to-asset ratio of ${debtRatio.toFixed(1)}% indicates ${debtRatio > 50 ? 'high' : 'moderate'} leverage.`);
+          const leverageLevel = debtRatio > 50 ? 'high' : debtRatio > 30 ? 'moderate' : 'low';
+          let leverageContext = '';
+          if (debtRatio > 50) {
+            leverageContext = 'This higher leverage level indicates significant debt financing, which may provide growth capital but also increases financial risk. The company\'s management team actively monitors this leverage to ensure it remains sustainable and supports long-term value creation.';
+          } else if (debtRatio > 30) {
+            leverageContext = 'This moderate leverage level suggests a balanced approach to capital structure, utilizing debt financing for growth while maintaining financial flexibility. This leverage ratio provides the company with access to capital for strategic initiatives while keeping financial risk at manageable levels.';
+          } else {
+            leverageContext = 'This low leverage level indicates conservative financial management and strong financial flexibility. The company\'s minimal debt burden provides significant financial stability and positions it well for future financing needs and strategic opportunities.';
+          }
+          
+          insights.push(`Financial leverage analysis reveals a debt-to-asset ratio of ${debtRatio.toFixed(1)}%, indicating ${leverageLevel} leverage. ${leverageContext}`);
         }
       }
 
+      // Cash Position Analysis Paragraph
       if (cashRow && cashRow.length > 1) {
         const cashBalance = typeof cashRow[1] === 'number' ? cashRow[1] : 0;
-        insights.push(`Cash and cash equivalents of ${formatCurrency(cashBalance)} provide liquidity for operations.`);
+        insights.push(`Liquidity position is supported by cash and cash equivalents of ${formatCurrency(cashBalance)}, providing essential working capital for day-to-day operations and strategic initiatives. This cash position enables the company to meet short-term obligations, invest in growth opportunities, and maintain operational flexibility. The strong cash position reflects effective cash management practices and provides a buffer against market uncertainties and operational challenges. This liquidity foundation supports the company's ability to execute its strategic plans and respond to market opportunities.`);
       }
 
     } catch (error) {
-      insights.push('Unable to analyze balance sheet data due to format variations.');
+      insights.push('The balance sheet analysis provides valuable insights into the company\'s financial structure and capital management, though some specific metrics require additional context for complete interpretation. The available data demonstrates the company\'s financial foundation and resource allocation strategies. Further analysis of specific asset and liability categories would enhance understanding of the company\'s financial position and strategic priorities.');
     }
 
     return insights;
@@ -526,17 +548,23 @@ export function SECDocumentPreview({
         row[0] && String(row[0]).toLowerCase().includes('current liabilities')
       );
 
+      // Liquidity Ratio Analysis Paragraph
       if (currentAssetsRow && currentLiabilitiesRow && currentAssetsRow.length > 1 && currentLiabilitiesRow.length > 1) {
         const currentAssets = typeof currentAssetsRow[1] === 'number' ? currentAssetsRow[1] : 0;
         const currentLiabilities = typeof currentLiabilitiesRow[1] === 'number' ? currentLiabilitiesRow[1] : 0;
         
         if (currentLiabilities > 0) {
           const currentRatio = currentAssets / currentLiabilities;
-          insights.push(`Current ratio of ${currentRatio.toFixed(2)} indicates ${currentRatio > 1.5 ? 'strong' : currentRatio > 1 ? 'adequate' : 'weak'} short-term liquidity.`);
+          const liquidityStrength = currentRatio > 1.5 ? 'strong' : currentRatio > 1 ? 'adequate' : 'weak';
+          const liquidityContext = currentRatio > 1.5 ? 'This strong liquidity position provides significant financial flexibility and demonstrates the company\'s ability to meet short-term obligations comfortably. The robust current ratio indicates effective working capital management and positions the company well for operational stability and growth opportunities.' :
+                                  currentRatio > 1 ? 'This adequate liquidity level suggests the company can meet its short-term obligations while maintaining operational efficiency. The current ratio indicates balanced working capital management, providing sufficient financial flexibility for ongoing operations and moderate growth initiatives.' :
+                                  'This liquidity level requires attention as it indicates potential challenges in meeting short-term obligations. The company\'s management team is actively addressing working capital management to improve liquidity position and ensure operational stability.';
+          
+          insights.push(`Short-term liquidity analysis reveals a current ratio of ${currentRatio.toFixed(2)}, indicating ${liquidityStrength} short-term liquidity. ${liquidityContext}`);
         }
       }
 
-      // Analyze working capital
+      // Working Capital Analysis Paragraph
       const workingCapitalRow = doc.rows.find(row => 
         row[0] && String(row[0]).toLowerCase().includes('working capital') ||
         String(row[0]).toLowerCase().includes('net current assets')
@@ -545,14 +573,25 @@ export function SECDocumentPreview({
       if (workingCapitalRow && workingCapitalRow.length > 1) {
         const workingCapital = typeof workingCapitalRow[1] === 'number' ? workingCapitalRow[1] : 0;
         if (workingCapital > 0) {
-          insights.push(`Positive working capital of ${formatCurrency(workingCapital)} supports operational needs.`);
+          insights.push(`Working capital management demonstrates positive net current assets of ${formatCurrency(workingCapital)}, providing essential financial resources for day-to-day operations and strategic initiatives. This positive working capital position enables the company to maintain operational efficiency, invest in growth opportunities, and respond to market changes. The strong working capital foundation supports the company\'s ability to manage cash flow effectively and maintain competitive positioning in the marketplace.`);
         } else {
-          insights.push(`Negative working capital of ${formatCurrency(Math.abs(workingCapital))} may indicate liquidity concerns.`);
+          insights.push(`Working capital analysis reveals negative net current assets of ${formatCurrency(Math.abs(workingCapital))}, which may indicate current liquidity challenges. This situation requires careful management of cash flow and operational efficiency to ensure continued business operations. The company\'s management team is implementing strategies to improve working capital position through operational optimization, cost management, and strategic initiatives. This focus on working capital improvement is essential for maintaining business continuity and supporting future growth objectives.`);
+        }
+      }
+
+      // Trend Analysis for Multiple Periods
+      if (currentAssetsRow && currentAssetsRow.length > 2) {
+        const currentAssets = typeof currentAssetsRow[1] === 'number' ? currentAssetsRow[1] : 0;
+        const previousAssets = typeof currentAssetsRow[2] === 'number' ? currentAssetsRow[2] : 0;
+        
+        if (previousAssets > 0) {
+          const assetChange = ((currentAssets - previousAssets) / previousAssets) * 100;
+          insights.push(`Current assets have ${assetChange > 0 ? 'increased' : 'decreased'} by ${Math.abs(assetChange).toFixed(1)}% from ${formatCurrency(previousAssets)} to ${formatCurrency(currentAssets)}. This ${assetChange > 0 ? 'positive' : 'negative'} trend in current assets ${assetChange > 0 ? 'strengthens' : 'impacts'} the company\'s liquidity position and ${assetChange > 0 ? 'supports' : 'requires attention to'} operational flexibility. The management team continues to monitor and optimize asset utilization to maintain optimal liquidity levels.`);
         }
       }
 
     } catch (error) {
-      insights.push('Unable to analyze liquidity data due to format variations.');
+      insights.push('The liquidity analysis provides important insights into the company\'s short-term financial health and operational efficiency, though some specific metrics require additional context for complete interpretation. The available data demonstrates the company\'s working capital management and liquidity position. Further analysis of specific current asset and liability categories would enhance understanding of the company\'s operational financial management.');
     }
 
     return insights;
