@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import * as XLSX from 'xlsx';
-import { UploadIcon, FileSpreadsheetIcon, AlertCircleIcon, CheckCircleIcon, XIcon, BarChartIcon, DollarSignIcon, TrendingUpIcon } from 'lucide-react';
+import { UploadIcon, FileSpreadsheetIcon, AlertCircleIcon, CheckCircleIcon, XIcon, BarChartIcon, DollarSignIcon, TrendingUpIcon, PlusIcon } from 'lucide-react';
 
 export interface FinancialData {
   headers: string[];
