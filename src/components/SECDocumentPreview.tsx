@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, PrinterIcon, DownloadIcon } from 'lucide-react';
 import { FinancialData } from './FinancialDataUploader';
+import { PDFDownloader } from './PDFDownloader';
 
 interface SECDocumentPreviewProps {
   financialData?: FinancialData[] | null;
@@ -50,6 +51,10 @@ export function SECDocumentPreview({
   ceoName = 'John Smith',
   relatedCompany = 'TechFin Holdings Ltd.'
 }: SECDocumentPreviewProps) {
+  const documentRef = useRef<HTMLDivElement>(null);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+
   // Function to extract financial figures from uploaded data
   const getFinancialFigure = (rowIndex: number, columnIndex: number, defaultValue: string, documentType?: string): string => {
     if (!financialData || financialData.length === 0) {
@@ -729,15 +734,54 @@ export function SECDocumentPreview({
           <button className="p-1 text-gray-600 hover:text-blue-700">
             <PrinterIcon size={18} />
           </button>
-          <button className="p-1 text-gray-600 hover:text-blue-700">
-            <DownloadIcon size={18} />
-          </button>
+          <PDFDownloader
+            documentRef={documentRef}
+            companyName={companyName}
+            onDownloadStart={() => setIsGeneratingPDF(true)}
+            onDownloadComplete={() => {
+              setIsGeneratingPDF(false);
+              setPdfError(null);
+            }}
+            onDownloadError={(error) => {
+              setIsGeneratingPDF(false);
+              setPdfError(error);
+            }}
+          />
         </div>
       </div>
       <div className="p-6 overflow-auto max-h-[70vh]" style={{
       fontFamily: 'Times New Roman, serif'
     }}>
-        <div className="max-w-4xl mx-auto">
+        <div ref={documentRef} className="max-w-4xl mx-auto">
+          {/* PDF Generation Status */}
+          {isGeneratingPDF && (
+            <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4 mb-6">
+              <div className="flex items-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600 mr-2"></div>
+                <p className="text-sm text-yellow-800 font-semibold">
+                  Generating PDF... Please wait while we prepare your prospectus for download.
+                </p>
+              </div>
+            </div>
+          )}
+          
+          {pdfError && (
+            <div className="bg-red-100 border border-red-300 rounded-lg p-4 mb-6">
+              <p className="text-sm text-red-800 font-semibold mb-2">
+                PDF Generation Error
+              </p>
+              <p className="text-sm text-red-700">
+                {pdfError}
+              </p>
+              <button
+                onClick={() => setPdfError(null)}
+                className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+          
           <div className="bg-blue-100 border border-blue-300 rounded-lg p-4 mb-6">
             <p className="text-sm text-blue-800 font-semibold mb-2">
               📊 Dynamic Field Integration Active
