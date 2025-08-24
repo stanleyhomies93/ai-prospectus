@@ -90,6 +90,7 @@ export function FinancialDataUploader({
   };
 
   const parseExcel = () => {
+    console.log('parseExcel called with file:', file?.name, 'sheet:', selectedSheet);
     if (!file || !selectedSheet) {
       setError('Please select a file and sheet first.');
       return;
@@ -165,15 +166,25 @@ export function FinancialDataUploader({
   };
 
   const handleContinueUploading = () => {
+    console.log('handleContinueUploading called');
     setSuccess(false);
     setFile(null);
     setError(null);
     setSheetNames([]);
     setSelectedSheet('');
     // Keep the current document type selected for convenience
+    console.log('State reset for continue uploading');
+    
+    // Reset the file input element
+    const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+      console.log('File input reset');
+    }
   };
 
   const handleUploadAnother = () => {
+    console.log('handleUploadAnother called');
     setSuccess(false);
     setFile(null);
     setError(null);
@@ -183,6 +194,13 @@ export function FinancialDataUploader({
     setDocumentType('general');
     setDataTitle('Financial Statements');
     setDataPeriod('For the years ended December 31, 2022, 2021, and 2020');
+    
+    // Reset the file input element
+    const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+      console.log('File input reset');
+    }
   };
 
   return (

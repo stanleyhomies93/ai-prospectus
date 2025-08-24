@@ -3,6 +3,7 @@ import { FileTextIcon, CheckIcon, PlusIcon, EditIcon, EyeIcon, DownloadIcon, Arr
 import { SECDocumentPreview } from './SECDocumentPreview';
 import { FinancialDataUploader, FinancialData } from './FinancialDataUploader';
 import { FinancialDataPreview } from './FinancialDataPreview';
+import { ErrorBoundary } from './ErrorBoundary';
 import { PresentationPreview } from './PresentationPreview';
 export function ProspectusGenerator() {
   const [activeStep, setActiveStep] = useState(1);
@@ -112,8 +113,13 @@ export function ProspectusGenerator() {
   };
   const handleFinancialDataParsed = (data: FinancialData) => {
     console.log('ProspectusGenerator received financial data:', data);
+    console.log('Current financialData length:', financialData.length);
     try {
-      setFinancialData(prev => [...prev, data]);
+      setFinancialData(prev => {
+        const newData = [...prev, data];
+        console.log('New financialData length:', newData.length);
+        return newData;
+      });
       console.log('Financial data added successfully');
     } catch (error) {
       console.error('Error adding financial data:', error);
@@ -1271,68 +1277,72 @@ export function ProspectusGenerator() {
                   </p>
                   <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
                     <div className="p-6">
-                      <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                          Upload Financial Data
-                        </h3>
-                        <p className="text-gray-600 mb-4">
-                          Upload multiple financial statements, balance sheets, income statements, 
-                          and other financial documents. Each document will be added as a separate 
-                          section in your prospectus.
-                        </p>
+                      <ErrorBoundary>
+                        <div className="mb-6">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                            Upload Financial Data
+                          </h3>
+                          <p className="text-gray-600 mb-4">
+                            Upload multiple financial statements, balance sheets, income statements, 
+                            and other financial documents. Each document will be added as a separate 
+                            section in your prospectus.
+                          </p>
+                          {financialData.length > 0 && (
+                            <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                              <p className="text-sm text-blue-800">
+                                <strong>Tip:</strong> You've uploaded {financialData.length} document{financialData.length !== 1 ? 's' : ''}. 
+                                Consider uploading different document types to create a comprehensive financial section:
+                              </p>
+                              <ul className="text-xs text-blue-700 mt-2 space-y-1">
+                                {financialData.length === 1 && <li>• <strong>Income Statement</strong> - for revenue and profitability data</li>}
+                                {financialData.length === 1 && <li>• <strong>Balance Sheet</strong> - for assets and liabilities</li>}
+                                {financialData.length === 1 && <li>• <strong>Cash Flow Statement</strong> - for cash flow analysis</li>}
+                                {financialData.length >= 2 && <li>• <strong>Liquidity & Capital Resources</strong> - for working capital analysis</li>}
+                                {financialData.length >= 2 && <li>• <strong>Additional financial metrics</strong> - for comprehensive coverage</li>}
+                              </ul>
+                            </div>
+                          )}
+                          <FinancialDataUploader 
+                            onDataParsed={handleFinancialDataParsed} 
+                            uploadedCount={financialData.length}
+                          />
+                        </div>
+                      </ErrorBoundary>
+                      
+                      <ErrorBoundary>
                         {financialData.length > 0 && (
-                          <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
-                            <p className="text-sm text-blue-800">
-                              <strong>Tip:</strong> You've uploaded {financialData.length} document{financialData.length !== 1 ? 's' : ''}. 
-                              Consider uploading different document types to create a comprehensive financial section:
-                            </p>
-                            <ul className="text-xs text-blue-700 mt-2 space-y-1">
-                              {financialData.length === 1 && <li>• <strong>Income Statement</strong> - for revenue and profitability data</li>}
-                              {financialData.length === 1 && <li>• <strong>Balance Sheet</strong> - for assets and liabilities</li>}
-                              {financialData.length === 1 && <li>• <strong>Cash Flow Statement</strong> - for cash flow analysis</li>}
-                              {financialData.length >= 2 && <li>• <strong>Liquidity & Capital Resources</strong> - for working capital analysis</li>}
-                              {financialData.length >= 2 && <li>• <strong>Additional financial metrics</strong> - for comprehensive coverage</li>}
-                            </ul>
+                          <div className="mt-6">
+                            <div className="flex items-center justify-between mb-4">
+                              <h3 className="text-lg font-semibold text-gray-900">
+                                Financial Data Preview ({financialData.length} document{financialData.length !== 1 ? 's' : ''})
+                              </h3>
+                              <button 
+                                onClick={resetFinancialData}
+                                className="text-sm text-red-600 hover:text-red-800 flex items-center"
+                              >
+                                <XIcon size={16} className="mr-1" />
+                                Clear All
+                              </button>
+                            </div>
+                            <div className="space-y-6">
+                              {financialData.map((data, index) => (
+                                <div key={index} className="relative">
+                                  <div className="absolute top-2 right-2 z-10">
+                                    <button
+                                      onClick={() => removeFinancialData(index)}
+                                      className="p-1 bg-red-100 text-red-600 rounded-full hover:bg-red-200"
+                                      title="Remove this document"
+                                    >
+                                      <XIcon size={16} />
+                                    </button>
+                                  </div>
+                                  <FinancialDataPreview key={`financial-data-${index}-${data.type}-${data.title}`} data={data} />
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         )}
-                        <FinancialDataUploader 
-                          onDataParsed={handleFinancialDataParsed} 
-                          uploadedCount={financialData.length}
-                        />
-                      </div>
-                      
-                      {financialData.length > 0 && (
-                        <div className="mt-6">
-                          <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold text-gray-900">
-                              Financial Data Preview ({financialData.length} document{financialData.length !== 1 ? 's' : ''})
-                            </h3>
-                            <button 
-                              onClick={resetFinancialData}
-                              className="text-sm text-red-600 hover:text-red-800 flex items-center"
-                            >
-                              <XIcon size={16} className="mr-1" />
-                              Clear All
-                            </button>
-                          </div>
-                          <div className="space-y-6">
-                            {financialData.map((data, index) => (
-                              <div key={index} className="relative">
-                                <div className="absolute top-2 right-2 z-10">
-                                  <button
-                                    onClick={() => removeFinancialData(index)}
-                                    className="p-1 bg-red-100 text-red-600 rounded-full hover:bg-red-200"
-                                    title="Remove this document"
-                                  >
-                                    <XIcon size={16} />
-                                  </button>
-                                </div>
-                                <FinancialDataPreview data={data} />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                      </ErrorBoundary>
                     </div>
                   </div>
                 </div>}
