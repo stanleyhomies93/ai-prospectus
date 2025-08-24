@@ -679,6 +679,7 @@ export function ProspectusGenerator() {
               </div>
               <SECDocumentPreview 
                 financialData={financialData}
+                riskFactors={riskFactors}
                 companyName={companyName}
                 companyDescription={companyDescription}
                 companyAddress={companyAddress}

@@ -4,6 +4,7 @@ import { FinancialData } from './FinancialDataUploader';
 
 interface SECDocumentPreviewProps {
   financialData?: FinancialData[] | null;
+  riskFactors?: Array<{title: string; description: string}>;
   // Company Information
   companyName?: string;
   companyDescription?: string;
@@ -28,6 +29,7 @@ interface SECDocumentPreviewProps {
 
 export function SECDocumentPreview({
   financialData,
+  riskFactors = [],
   companyName = 'TechFin Solutions, Inc.',
   companyDescription = 'A leading technology company providing innovative solutions.',
   companyAddress = '123 Main Street, San Francisco, CA 94105',
@@ -232,6 +234,126 @@ export function SECDocumentPreview({
         Our strong financial position, with total assets of <span className="bg-yellow-200 px-1 rounded font-semibold">${totalAssets}</span> and cash reserves of <span className="bg-yellow-200 px-1 rounded font-semibold">${cashBalance}</span>, provides us with the resources needed to continue our growth and expansion plans. Our solid revenue base of <span className="bg-yellow-200 px-1 rounded font-semibold">${revenue}</span> demonstrates our ability to generate sustainable income while maintaining healthy cash flow.
       </>
     );
+  };
+
+  // Intelligent risk factors content generation
+  const generateRiskFactorsContent = (): JSX.Element => {
+    if (!riskFactors || riskFactors.length === 0) {
+      return (
+        <div className="my-12">
+          <p className="text-xl font-bold mb-4">RISK FACTORS</p>
+          <p className="mb-4 text-sm">
+            Investing in our common stock involves a high degree of risk. You should carefully consider the risks described below, together with all of the other information included in this prospectus, before making an investment decision. If any of the following risks actually occur, our business, financial condition, results of operations, and prospects could be materially and adversely affected.
+          </p>
+          <p className="text-sm text-gray-500 italic">
+            [Risk factors will be populated based on your industry and country selection]
+          </p>
+        </div>
+      );
+    }
+
+    const totalAssets = getTotalAssets();
+    const cashBalance = getCashBalance();
+    const revenue = getRevenue();
+    const totalLiabilities = getTotalLiabilities();
+
+    return (
+      <div className="my-12">
+        <p className="text-xl font-bold mb-4">RISK FACTORS</p>
+        <p className="mb-4 text-sm">
+          Investing in our common stock involves a high degree of risk. You should carefully consider the risks described below, together with all of the other information included in this prospectus, before making an investment decision. If any of the following risks actually occur, our business, financial condition, results of operations, and prospects could be materially and adversely affected.
+        </p>
+        
+        <p className="mb-4 text-sm">
+          The following risk factors are based on our current business operations, financial position, and market conditions. Our total assets of <span className="bg-yellow-200 px-1 rounded font-semibold">${totalAssets}</span>, cash reserves of <span className="bg-yellow-200 px-1 rounded font-semibold">${cashBalance}</span>, and annual revenue of <span className="bg-yellow-200 px-1 rounded font-semibold">${revenue}</span> provide context for understanding these risks in relation to our financial capacity to address them.
+        </p>
+
+        {riskFactors.map((risk, index) => (
+          <div key={index} className="mb-6">
+            <p className="font-bold text-sm mb-2">
+              {index + 1}. {risk.title}
+            </p>
+            <p className="text-sm mb-3">
+              {generateIntelligentRiskDescription(risk, totalAssets, cashBalance, revenue, totalLiabilities)}
+            </p>
+          </div>
+        ))}
+
+        <p className="text-sm mt-6">
+          The risks described above are not the only risks we face. Additional risks and uncertainties not currently known to us or that we currently deem immaterial may also materially and adversely affect our business, financial condition, results of operations, and prospects.
+        </p>
+      </div>
+    );
+  };
+
+  // Generate intelligent risk descriptions with financial context
+  const generateIntelligentRiskDescription = (
+    risk: {title: string; description: string}, 
+    totalAssets: string, 
+    cashBalance: string, 
+    revenue: string, 
+    totalLiabilities: string
+  ): string => {
+    const baseDescription = risk.description;
+    
+    // Add financial context based on risk type
+    if (risk.title.toLowerCase().includes('financial') || risk.title.toLowerCase().includes('economic')) {
+      return `${baseDescription} Our current financial position, with total assets of $${totalAssets} and cash reserves of $${cashBalance}, provides some protection against these risks, but significant economic downturns could still materially impact our operations and financial performance.`;
+    }
+    
+    if (risk.title.toLowerCase().includes('regulatory') || risk.title.toLowerCase().includes('compliance')) {
+      return `${baseDescription} Compliance with these regulations may require significant investment of our resources, potentially affecting our profitability. Our current revenue of $${revenue} provides some flexibility to absorb compliance costs, but substantial regulatory changes could require additional capital expenditures.`;
+    }
+    
+    if (risk.title.toLowerCase().includes('competition')) {
+      return `${baseDescription} Our ability to compete effectively depends on our financial resources, including our cash reserves of $${cashBalance} and total assets of $${totalAssets}, which we use to invest in technology, marketing, and talent acquisition.`;
+    }
+    
+    if (risk.title.toLowerCase().includes('technology') || risk.title.toLowerCase().includes('cybersecurity')) {
+      return `${baseDescription} Addressing these risks requires ongoing investment in technology infrastructure and security measures. Our current cash reserves of $${cashBalance} provide resources for such investments, but the costs of maintaining adequate security measures continue to increase.`;
+    }
+    
+    if (risk.title.toLowerCase().includes('talent') || risk.title.toLowerCase().includes('recruitment')) {
+      return `${baseDescription} Our ability to attract and retain qualified personnel depends in part on our financial resources and competitive compensation packages. Our revenue of $${revenue} and cash reserves of $${cashBalance} provide some flexibility in this regard, but competition for talent remains intense.`;
+    }
+    
+    if (risk.title.toLowerCase().includes('supply chain') || risk.title.toLowerCase().includes('logistics')) {
+      return `${baseDescription} Our total assets of $${totalAssets} and cash reserves of $${cashBalance} provide some buffer against supply chain disruptions, but significant disruptions could still impact our operations and financial performance.`;
+    }
+    
+    if (risk.title.toLowerCase().includes('currency') || risk.title.toLowerCase().includes('exchange rate')) {
+      return `${baseDescription} Our cash reserves of $${cashBalance} and total assets of $${totalAssets} are denominated in various currencies, and fluctuations in exchange rates could impact our financial position and reported results.`;
+    }
+    
+    if (risk.title.toLowerCase().includes('political') || risk.title.toLowerCase().includes('social')) {
+      return `${baseDescription} Our operations and financial performance could be materially affected by political or social instability in our markets. Our diversified asset base of $${totalAssets} provides some protection, but significant instability could still impact our business.`;
+    }
+    
+    // Default enhanced description
+    return `${baseDescription} Our current financial position, including total assets of $${totalAssets} and cash reserves of $${cashBalance}, provides some protection against these risks, but they could still materially impact our business operations and financial performance.`;
+  };
+
+  // Get total liabilities for risk analysis
+  const getTotalLiabilities = (): string => {
+    if (!financialData || financialData.length === 0) return '150,000';
+    
+    // Look for balance sheet data first
+    const balanceSheet = financialData.find(doc => doc.type === 'balance');
+    if (balanceSheet) {
+      // Look for "Total Liabilities" row
+      const totalLiabilitiesRow = balanceSheet.rows.find(row => 
+        row[0] && String(row[0]).toLowerCase().includes('total liabilities')
+      );
+      if (totalLiabilitiesRow && totalLiabilitiesRow[1]) {
+        const value = totalLiabilitiesRow[1];
+        if (typeof value === 'number') {
+          return new Intl.NumberFormat('en-US').format(value);
+        }
+        return String(value);
+      }
+    }
+    
+    return '150,000';
   };
 
   // Extract common financial figures for use throughout the document
@@ -698,85 +820,7 @@ export function SECDocumentPreview({
           </div>
           
           <div className="page-break"></div>
-          <div className="my-12">
-            <p className="text-xl font-bold mb-4">RISK FACTORS</p>
-            <p className="mb-4 text-sm">
-              Investing in our Class A Ordinary Shares involves a high degree of risk. You
-              should carefully consider the risks described below, together with
-              all of the other information included in this prospectus, before
-              making an investment decision. If any of the following risks
-              actually occur, our business, financial condition, results of
-              operations, and prospects could be materially and adversely
-              affected. In that case, the trading price of our Class A Ordinary Shares
-              could decline, and you could lose part or all of your investment.
-            </p>
-            
-            <p className="text-lg font-bold mb-2">Risks Related to Our Business</p>
-            
-            <p className="text-sm font-bold mb-1">We have a history of losses and may not achieve or maintain profitability.</p>
-            <p className="mb-4 text-sm">
-              We have incurred net losses in each year since our inception in 2009.
-              We had net losses of <span className="bg-yellow-200 px-1 rounded font-semibold">${netLoss2021}</span>, <span className="bg-yellow-200 px-1 rounded font-semibold">${netLoss2022}</span>, and <span className="bg-yellow-200 px-1 rounded font-semibold">${netLoss2023}</span>
-              for the years ended December 31, 2021, 2022, and 2023, respectively.
-              We expect to continue to incur significant expenses and operating
-              losses for the foreseeable future as we continue to invest in our
-              business, expand our operations, and develop new educational programs and
-              services.
-            </p>
-            
-            <p className="text-sm font-bold mb-1">We face intense competition in the English language education industry.</p>
-            <p className="mb-4 text-sm">
-              The English language education industry in Hong Kong is highly competitive and
-              fragmented. We compete with large, well-established education companies such
-              as Kumon, EF Education First, and others, as well as numerous smaller
-              regional and local English language schools and tutoring centers. Many of our competitors have
-              significantly greater financial, technical, and marketing
-              resources than we do.
-            </p>
-            
-            <p className="text-sm font-bold mb-1">Our business depends on maintaining and expanding our student base.</p>
-            <p className="mb-4 text-sm">
-              Our success depends on our ability to maintain and expand our
-              student base. If we are unable to attract new students or retain
-              existing students, our revenue growth and profitability would be
-              adversely affected. Student acquisition costs are significant,
-              and we may not be able to recover these costs through student
-              relationships.
-            </p>
-            
-            <p className="text-lg font-bold mb-2">Risks Related to Our Industry</p>
-            
-            <p className="text-sm font-bold mb-1">Changes in education regulations could adversely affect our business.</p>
-            <p className="mb-4 text-sm">
-              The private education industry in Hong Kong is subject to extensive regulation
-              by the Education Bureau and other government authorities. Changes in these
-              regulations, including those related to curriculum standards, teacher qualifications,
-              and facility requirements, could require us to modify
-              our business practices, increase our compliance costs, or
-              otherwise adversely affect our business.
-            </p>
-            
-            <p className="text-sm font-bold mb-1">Dependence on brand license from our related company.</p>
-            <p className="mb-4 text-sm">
-              We depend on our license from <span className="bg-green-200 px-1 rounded font-semibold">{relatedCompany}</span> to use the "<span className="bg-green-200 px-1 rounded font-semibold">{companyName}</span>" brand name for our business operations. 
-              Any termination or modification of this license could materially adversely affect our business and results of operations.
-              Under the franchise agreements, <span className="bg-green-200 px-1 rounded font-semibold">{relatedCompany}</span> has the right to terminate any of the franchise agreements
-              under certain circumstances.
-            </p>
-            
-            <p className="text-sm font-bold mb-1">Limited geographic diversification.</p>
-            <p className="mb-4 text-sm">
-              Our operations are concentrated in Hong Kong, making us susceptible to local economic conditions, 
-              regulatory changes, and market dynamics specific to Hong Kong. Any adverse developments in Hong Kong's 
-              economy, political environment, or education policies could significantly impact our business.
-            </p>
-            
-            <p className="text-sm font-bold mb-1">Key personnel dependence.</p>
-            <p className="mb-4 text-sm">
-              Our success depends on our ability to attract, retain and motivate qualified teaching staff and management personnel. 
-              The loss of key personnel, including our Chief Executive Officer <span className="bg-green-200 px-1 rounded font-semibold">{ceoName}</span>, could adversely affect our business operations.
-            </p>
-          </div>
+          {generateRiskFactorsContent()}
           
                       {financialData && financialData.length > 0 && (
                         <div className="my-12">
