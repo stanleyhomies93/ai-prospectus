@@ -522,43 +522,43 @@ export function SECDocumentPreview({
                 beginning on page 12.
               </p>
             </div>
-            <table className="w-full border-collapse border border-black text-sm my-8">
+            <table className="w-full text-sm my-8">
               <thead>
-                <tr className="border-b border-black">
-                  <th className="border-r border-black p-2 text-left"></th>
-                  <th className="border-r border-black p-2 text-center">
+                <tr className="border-b-2 border-gray-800">
+                  <th className="p-2 text-left"></th>
+                  <th className="p-2 text-center">
                     Per Share
                   </th>
                   <th className="p-2 text-center">Total</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b border-black">
-                  <td className="border-r border-black p-2">
+                <tr className="bg-blue-50">
+                  <td className="p-2">
                     Initial public offering price
                   </td>
-                  <td className="border-r border-black p-2 text-center">
+                  <td className="p-2 text-center">
                     $15.00
                   </td>
                   <td className="p-2 text-center">$150,000,000</td>
                 </tr>
-                <tr className="border-b border-black">
-                  <td className="border-r border-black p-2">
+                <tr className="bg-white">
+                  <td className="p-2">
                     Underwriting discounts and commissions(1)
                   </td>
-                  <td className="border-r border-black p-2 text-center">
+                  <td className="p-2 text-center">
                     $1.05
                   </td>
                   <td className="p-2 text-center">$10,500,000</td>
                 </tr>
-                <tr>
-                  <td className="border-r border-black p-2">
+                <tr className="bg-blue-50 border-b-2 border-gray-800">
+                  <td className="p-2 font-semibold">
                     Proceeds, before expenses, to us
                   </td>
-                  <td className="border-r border-black p-2 text-center">
+                  <td className="p-2 text-center font-semibold">
                     $13.95
                   </td>
-                  <td className="p-2 text-center">$139,500,000</td>
+                  <td className="p-2 text-center font-semibold">$139,500,000</td>
                 </tr>
               </tbody>
             </table>
@@ -841,32 +841,38 @@ export function SECDocumentPreview({
                               <div className="text-xs text-gray-700 mb-2">
                                 (in thousands, except per share data)
                               </div>
-                              <table className="w-full border-collapse border border-black text-sm mb-4">
+                              <table className="w-full text-sm mb-4">
                                 <thead>
-                                  <tr className="border-b border-black">
+                                  <tr className="border-b-2 border-gray-800">
                                     {doc.headers.map((header: string, index: number) => (
-                                      <th key={index} className={`border-r border-black p-2 ${index === 0 ? 'text-left' : 'text-center'}`}>
+                                      <th key={index} className={`p-2 ${index === 0 ? 'text-left' : 'text-center'}`}>
                                         {header}
                                       </th>
                                     ))}
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {doc.rows.map((row: (string | number)[], rowIndex: number) => (
-                                    <tr key={rowIndex} className="border-b border-black">
-                                      {row.map((cell: string | number, cellIndex: number) => {
-                                        const formattedValue = typeof cell === 'number' ? new Intl.NumberFormat('en-US', {
-                                          minimumFractionDigits: 0,
-                                          maximumFractionDigits: 2
-                                        }).format(cell) : cell;
-                                        return (
-                                          <td key={cellIndex} className={`border-r border-black p-2 ${cellIndex === 0 ? '' : 'text-right'}`}>
-                                            {formattedValue}
-                                          </td>
-                                        );
-                                      })}
-                                    </tr>
-                                  ))}
+                                  {doc.rows.map((row: (string | number)[], rowIndex: number) => {
+                                    const isEvenRow = rowIndex % 2 === 0;
+                                    const isLastRow = rowIndex === doc.rows.length - 1;
+                                    const isTotalRow = row[0] && String(row[0]).toLowerCase().includes('total');
+                                    
+                                    return (
+                                      <tr key={rowIndex} className={`${isEvenRow ? 'bg-blue-50' : 'bg-white'} ${isLastRow || isTotalRow ? 'border-b-2 border-gray-800' : ''}`}>
+                                        {row.map((cell: string | number, cellIndex: number) => {
+                                          const formattedValue = typeof cell === 'number' ? new Intl.NumberFormat('en-US', {
+                                            minimumFractionDigits: 0,
+                                            maximumFractionDigits: 2
+                                          }).format(cell) : cell;
+                                          return (
+                                            <td key={cellIndex} className={`p-2 ${cellIndex === 0 ? '' : 'text-right'} ${isTotalRow ? 'font-semibold' : ''}`}>
+                                              {formattedValue}
+                                            </td>
+                                          );
+                                        })}
+                                      </tr>
+                                    );
+                                  })}
                                 </tbody>
                               </table>
                             </div>
