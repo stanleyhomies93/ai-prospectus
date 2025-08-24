@@ -303,39 +303,39 @@ export function SECDocumentPreview({
     
     // Add financial context based on risk type
     if (risk.title.toLowerCase().includes('financial') || risk.title.toLowerCase().includes('economic')) {
-      return `${baseDescription} Our current financial position, with total assets of $${totalAssets} and cash reserves of $${cashBalance}, provides some protection against these risks, but significant economic downturns could still materially impact our operations and financial performance.`;
+      return `${baseDescription} [Advanced financial risk analysis and economic impact assessment will be provided when sophisticated AI reasoning capabilities are integrated.]`;
     }
     
     if (risk.title.toLowerCase().includes('regulatory') || risk.title.toLowerCase().includes('compliance')) {
-      return `${baseDescription} Compliance with these regulations may require significant investment of our resources, potentially affecting our profitability. Our current revenue of $${revenue} provides some flexibility to absorb compliance costs, but substantial regulatory changes could require additional capital expenditures.`;
+      return `${baseDescription} [Comprehensive regulatory compliance analysis and resource impact assessment will be provided when advanced AI capabilities are integrated.]`;
     }
     
     if (risk.title.toLowerCase().includes('competition')) {
-      return `${baseDescription} Our ability to compete effectively depends on our financial resources, including our cash reserves of $${cashBalance} and total assets of $${totalAssets}, which we use to invest in technology, marketing, and talent acquisition.`;
+      return `${baseDescription} [Detailed competitive analysis and strategic resource allocation assessment will be provided when advanced AI reasoning capabilities are integrated.]`;
     }
     
     if (risk.title.toLowerCase().includes('technology') || risk.title.toLowerCase().includes('cybersecurity')) {
-      return `${baseDescription} Addressing these risks requires ongoing investment in technology infrastructure and security measures. Our current cash reserves of $${cashBalance} provide resources for such investments, but the costs of maintaining adequate security measures continue to increase.`;
+      return `${baseDescription} [Comprehensive technology risk analysis and investment impact assessment will be provided when advanced AI capabilities are integrated.]`;
     }
     
     if (risk.title.toLowerCase().includes('talent') || risk.title.toLowerCase().includes('recruitment')) {
-      return `${baseDescription} Our ability to attract and retain qualified personnel depends in part on our financial resources and competitive compensation packages. Our revenue of $${revenue} and cash reserves of $${cashBalance} provide some flexibility in this regard, but competition for talent remains intense.`;
+      return `${baseDescription} [Detailed talent acquisition analysis and compensation strategy assessment will be provided when advanced AI reasoning capabilities are integrated.]`;
     }
     
     if (risk.title.toLowerCase().includes('supply chain') || risk.title.toLowerCase().includes('logistics')) {
-      return `${baseDescription} Our total assets of $${totalAssets} and cash reserves of $${cashBalance} provide some buffer against supply chain disruptions, but significant disruptions could still impact our operations and financial performance.`;
+      return `${baseDescription} [Comprehensive supply chain risk analysis and operational impact assessment will be provided when advanced AI capabilities are integrated.]`;
     }
     
     if (risk.title.toLowerCase().includes('currency') || risk.title.toLowerCase().includes('exchange rate')) {
-      return `${baseDescription} Our cash reserves of $${cashBalance} and total assets of $${totalAssets} are denominated in various currencies, and fluctuations in exchange rates could impact our financial position and reported results.`;
+      return `${baseDescription} [Detailed currency risk analysis and exchange rate impact assessment will be provided when advanced AI reasoning capabilities are integrated.]`;
     }
     
     if (risk.title.toLowerCase().includes('political') || risk.title.toLowerCase().includes('social')) {
-      return `${baseDescription} Our operations and financial performance could be materially affected by political or social instability in our markets. Our diversified asset base of $${totalAssets} provides some protection, but significant instability could still impact our business.`;
+      return `${baseDescription} [Comprehensive political and social risk analysis will be provided when advanced AI capabilities are integrated.]`;
     }
     
     // Default enhanced description
-    return `${baseDescription} Our current financial position, including total assets of $${totalAssets} and cash reserves of $${cashBalance}, provides some protection against these risks, but they could still materially impact our business operations and financial performance.`;
+    return `${baseDescription} [Additional risk analysis and financial impact assessment will be provided when advanced AI reasoning capabilities are integrated into the system.]`;
   };
 
   // Get total liabilities for risk analysis
