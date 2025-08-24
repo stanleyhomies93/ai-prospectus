@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { FileTextIcon, CheckIcon, PlusIcon, EditIcon, EyeIcon, DownloadIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon, ClipboardCheckIcon, PanelLeftIcon, PanelRightIcon, LayoutTemplateIcon, ExternalLinkIcon, FileSpreadsheetIcon, TableIcon, ChevronDownIcon, ChevronRightIcon, SaveIcon, FolderIcon, FileIcon, SearchIcon, SettingsIcon, AlertTriangleIcon, TrashIcon, PresentationIcon, MonitorIcon, ChevronsRightIcon, UploadIcon, GlobeIcon, LinkIcon, BuildingIcon, BriefcaseIcon, InfoIcon, BotIcon, ZapIcon, RefreshCwIcon, CreditCardIcon, DollarSignIcon, BarChartIcon, ShoppingCartIcon, UserIcon } from 'lucide-react';
+import { FileTextIcon, CheckIcon, PlusIcon, EditIcon, EyeIcon, DownloadIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon, ClipboardCheckIcon, PanelLeftIcon, PanelRightIcon, LayoutTemplateIcon, ExternalLinkIcon, FileSpreadsheetIcon, TableIcon, ChevronDownIcon, ChevronRightIcon, SaveIcon, FolderIcon, FileIcon, SearchIcon, SettingsIcon, AlertTriangleIcon, TrashIcon, PresentationIcon, MonitorIcon, ChevronsRightIcon, UploadIcon, GlobeIcon, LinkIcon, BuildingIcon, BriefcaseIcon, InfoIcon, BotIcon, ZapIcon, RefreshCwIcon, CreditCardIcon, DollarSignIcon, BarChartIcon, ShoppingCartIcon, UserIcon, XIcon } from 'lucide-react';
 import { SECDocumentPreview } from './SECDocumentPreview';
 import { FinancialDataUploader, FinancialData } from './FinancialDataUploader';
 import { FinancialDataPreview } from './FinancialDataPreview';
@@ -111,7 +111,13 @@ export function ProspectusGenerator() {
     setShowSECPreview(false);
   };
   const handleFinancialDataParsed = (data: FinancialData) => {
-    setFinancialData(prev => [...prev, data]);
+    console.log('ProspectusGenerator received financial data:', data);
+    try {
+      setFinancialData(prev => [...prev, data]);
+      console.log('Financial data added successfully');
+    } catch (error) {
+      console.error('Error adding financial data:', error);
+    }
   };
   
   const resetFinancialData = () => {

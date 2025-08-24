@@ -126,15 +126,25 @@ export function FinancialDataUploader({
           return paddedRow;
         });
         // Send the parsed data to parent component
-        onDataParsed({
+        const parsedData = {
           headers,
           rows,
           title: dataTitle,
           period: dataPeriod,
           type: documentType
-        });
-        setSuccess(true);
-        setIsLoading(false);
+        };
+        
+        console.log('Parsed financial data:', parsedData);
+        
+        try {
+          onDataParsed(parsedData);
+          setSuccess(true);
+          setIsLoading(false);
+        } catch (error) {
+          console.error('Error in onDataParsed callback:', error);
+          setError('Failed to process financial data. Please try again.');
+          setIsLoading(false);
+        }
       } catch (err) {
         setError('Failed to parse Excel data. Please make sure the file is in the correct format.');
         setIsLoading(false);

@@ -11,8 +11,34 @@ export function FinancialDataPreview({
   data,
   onReset
 }: FinancialDataPreviewProps) {
-  if (!data || !data.headers || !data.rows || data.rows.length === 0) {
-    return null;
+  // Add debugging and better error handling
+  console.log('FinancialDataPreview received data:', data);
+  
+  if (!data) {
+    console.log('No data provided to FinancialDataPreview');
+    return (
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <p className="text-gray-500">No financial data available</p>
+      </div>
+    );
+  }
+  
+  if (!data.headers || !Array.isArray(data.headers) || data.headers.length === 0) {
+    console.log('No headers in financial data');
+    return (
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <p className="text-gray-500">Invalid financial data format: missing headers</p>
+      </div>
+    );
+  }
+  
+  if (!data.rows || !Array.isArray(data.rows) || data.rows.length === 0) {
+    console.log('No rows in financial data');
+    return (
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <p className="text-gray-500">Invalid financial data format: missing data rows</p>
+      </div>
+    );
   }
 
   const getDocumentTypeIcon = (type?: string) => {
