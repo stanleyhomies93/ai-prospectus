@@ -32,13 +32,14 @@ export const PDFDownloader: React.FC<PDFDownloaderProps> = ({
       
       // Style the clone for PDF generation
       clone.style.width = '210mm'; // A4 width
-      clone.style.minHeight = '297mm'; // A4 height
       clone.style.padding = '20mm';
       clone.style.margin = '0';
       clone.style.backgroundColor = 'white';
       clone.style.color = 'black';
       clone.style.fontSize = '12px';
       clone.style.lineHeight = '1.4';
+      clone.style.position = 'relative';
+      clone.style.overflow = 'visible';
       
       // Remove interactive elements and buttons
       const buttons = clone.querySelectorAll('button');
@@ -50,49 +51,84 @@ export const PDFDownloader: React.FC<PDFDownloaderProps> = ({
         notice.remove();
       }
 
+      // Remove loading and error indicators if present
+      const loadingIndicator = clone.querySelector('.bg-yellow-100');
+      if (loadingIndicator) {
+        loadingIndicator.remove();
+      }
+      
+      const errorIndicator = clone.querySelector('.bg-red-100');
+      if (errorIndicator) {
+        errorIndicator.remove();
+      }
+
       // Temporarily append clone to body for rendering
       clone.style.position = 'absolute';
       clone.style.left = '-9999px';
       clone.style.top = '0';
+      clone.style.height = 'auto';
       document.body.appendChild(clone);
 
-      // Generate canvas from the clone
-      const canvas = await html2canvas(clone, {
+      // Create PDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const contentWidth = 794; // Content width in pixels
+      const contentHeight = 1123; // Content height in pixels
+
+      // Generate the full document as one canvas first
+      const fullCanvas = await html2canvas(clone, {
         scale: 2, // Higher resolution
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
-        width: 794, // A4 width in pixels at 96 DPI
-        height: 1123, // A4 height in pixels at 96 DPI
+        width: contentWidth,
+        height: clone.scrollHeight,
         scrollX: 0,
         scrollY: 0,
-        windowWidth: 794,
-        windowHeight: 1123
+        windowWidth: contentWidth,
+        windowHeight: clone.scrollHeight
       });
+
+      // Calculate how many pages we need
+      const totalHeight = fullCanvas.height;
+      const pageHeightPixels = contentHeight * 2; // Account for scale
+      const totalPages = Math.ceil(totalHeight / pageHeightPixels);
+
+      // Split the canvas into pages
+      for (let page = 0; page < totalPages; page++) {
+        if (page > 0) {
+          pdf.addPage();
+        }
+
+        // Create a temporary canvas for this page
+        const pageCanvas = document.createElement('canvas');
+        const ctx = pageCanvas.getContext('2d');
+        if (!ctx) continue;
+
+        // Set canvas size for this page
+        pageCanvas.width = fullCanvas.width;
+        pageCanvas.height = Math.min(pageHeightPixels, totalHeight - (page * pageHeightPixels));
+
+        // Draw the portion of the full canvas for this page
+        ctx.drawImage(
+          fullCanvas,
+          0, page * pageHeightPixels, // Source x, y
+          fullCanvas.width, pageCanvas.height, // Source width, height
+          0, 0, // Destination x, y
+          pageCanvas.width, pageCanvas.height // Destination width, height
+        );
+
+        // Convert canvas to image and add to PDF
+        const imgData = pageCanvas.toDataURL('image/png');
+        const imgWidth = pageWidth;
+        const imgHeight = (pageCanvas.height * pageWidth) / pageCanvas.width;
+
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      }
 
       // Remove the clone
       document.body.removeChild(clone);
-
-      // Create PDF
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-
-      let position = 0;
-
-      // Add first page
-      pdf.addImage(canvas, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      // Add additional pages if content is longer than one page
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(canvas, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
 
       // Generate filename
       const timestamp = new Date().toISOString().split('T')[0];
