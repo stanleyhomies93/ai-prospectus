@@ -95,7 +95,14 @@ export function ProspectusGenerator() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedSimilarCompanies, setSelectedSimilarCompanies] = useState<string[]>([]);
   const handleStepChange = step => {
-    setActiveStep(step);
+    console.log('handleStepChange called with step:', step);
+    console.log('Current activeStep:', activeStep);
+    try {
+      setActiveStep(step);
+      console.log('Step changed successfully to:', step);
+    } catch (error) {
+      console.error('Error in handleStepChange:', error);
+    }
   };
   const handleTemplateSelect = template => {
     setSelectedTemplate(template);
@@ -1347,7 +1354,8 @@ export function ProspectusGenerator() {
                   </div>
                 </div>}
               {/* Step 4: Review (formerly Step 3) */}
-              {activeStep === 4 && <div>
+              {activeStep === 4 && <ErrorBoundary>
+                <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">
                     Review Your Prospectus
                   </h2>
@@ -1413,16 +1421,15 @@ export function ProspectusGenerator() {
                             businesses to manage transactions and gain insights
                             into their financial performance.
                           </p>
-                          {financialData && <>
+                          {financialData && financialData.length > 0 && <>
                               <h6 className="font-bold mt-4 mb-2">
                                 FINANCIAL INFORMATION
                               </h6>
                               <p className="mb-2">
-                                The following table presents our{' '}
-                                {financialData.title.toLowerCase()}:
+                                The following tables present our financial data:
                               </p>
                               <div className="text-xs italic text-gray-500 mb-2">
-                                [Financial table will appear here in the final
+                                [Financial tables will appear here in the final
                                 document]
                               </div>
                             </>}
@@ -1486,7 +1493,8 @@ export function ProspectusGenerator() {
                       <ArrowRightIcon size={16} className="ml-2" />
                     </button>
                   </div>
-                </div>}
+                </div>
+              </ErrorBoundary>}
               {/* Step 5: Generate (formerly Step 4) */}
               {activeStep === 5 && <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">
