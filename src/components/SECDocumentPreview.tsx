@@ -6,6 +6,7 @@ interface SECDocumentPreviewProps {
   financialData?: FinancialData[] | null;
   // Company Information
   companyName?: string;
+  companyDescription?: string;
   companyAddress?: string;
   companyPhone?: string;
   tickerSymbol?: string;
@@ -28,6 +29,7 @@ interface SECDocumentPreviewProps {
 export function SECDocumentPreview({
   financialData,
   companyName = 'TechFin Solutions, Inc.',
+  companyDescription = 'A leading technology company providing innovative solutions.',
   companyAddress = '123 Main Street, San Francisco, CA 94105',
   companyPhone = '+1 (555) 123-4567',
   tickerSymbol = 'TFIN',
@@ -97,6 +99,138 @@ export function SECDocumentPreview({
           return match;
         })}
       </span>
+    );
+  };
+
+  // Intelligent financial data extraction functions
+  const getTotalAssets = (): string => {
+    if (!financialData || financialData.length === 0) return '192,500';
+    
+    // Look for balance sheet data first
+    const balanceSheet = financialData.find(doc => doc.type === 'balance');
+    if (balanceSheet) {
+      // Look for "Total Assets" row
+      const totalAssetsRow = balanceSheet.rows.find(row => 
+        row[0] && String(row[0]).toLowerCase().includes('total assets')
+      );
+      if (totalAssetsRow && totalAssetsRow[1]) {
+        const value = totalAssetsRow[1];
+        if (typeof value === 'number') {
+          return new Intl.NumberFormat('en-US').format(value);
+        }
+        return String(value);
+      }
+    }
+    
+    // Fallback to first document's first significant number
+    const firstDoc = financialData[0];
+    if (firstDoc && firstDoc.rows.length > 0) {
+      for (let row of firstDoc.rows) {
+        for (let cell of row) {
+          if (typeof cell === 'number' && cell > 1000) {
+            return new Intl.NumberFormat('en-US').format(cell);
+          }
+        }
+      }
+    }
+    
+    return '192,500';
+  };
+
+  const getCashBalance = (): string => {
+    if (!financialData || financialData.length === 0) return '28.5M';
+    
+    // Look for balance sheet data first
+    const balanceSheet = financialData.find(doc => doc.type === 'balance');
+    if (balanceSheet) {
+      // Look for "Cash" or "Cash and Cash Equivalents" row
+      const cashRow = balanceSheet.rows.find(row => 
+        row[0] && String(row[0]).toLowerCase().includes('cash')
+      );
+      if (cashRow && cashRow[1]) {
+        const value = cashRow[1];
+        if (typeof value === 'number') {
+          return new Intl.NumberFormat('en-US').format(value);
+        }
+        return String(value);
+      }
+    }
+    
+    // Look for liquidity data
+    const liquidityDoc = financialData.find(doc => doc.type === 'liquidity');
+    if (liquidityDoc && liquidityDoc.rows.length > 0) {
+      for (let row of liquidityDoc.rows) {
+        if (row[0] && String(row[0]).toLowerCase().includes('cash')) {
+          if (row[1] && typeof row[1] === 'number') {
+            return new Intl.NumberFormat('en-US').format(row[1]);
+          }
+        }
+      }
+    }
+    
+    return '28.5M';
+  };
+
+  const getRevenue = (): string => {
+    if (!financialData || financialData.length === 0) return '15.2M';
+    
+    // Look for income statement data
+    const incomeStatement = financialData.find(doc => doc.type === 'income');
+    if (incomeStatement) {
+      // Look for "Revenue" or "Sales" row
+      const revenueRow = incomeStatement.rows.find(row => 
+        row[0] && (String(row[0]).toLowerCase().includes('revenue') || 
+                  String(row[0]).toLowerCase().includes('sales'))
+      );
+      if (revenueRow && revenueRow[1]) {
+        const value = revenueRow[1];
+        if (typeof value === 'number') {
+          return new Intl.NumberFormat('en-US').format(value);
+        }
+        return String(value);
+      }
+    }
+    
+    return '15.2M';
+  };
+
+  // Intelligent market analysis based on company description
+  const generateMarketAnalysis = (): string => {
+    const description = companyDescription || companyName || '';
+    const isEducation = description.toLowerCase().includes('education') || 
+                       description.toLowerCase().includes('learning') ||
+                       description.toLowerCase().includes('academy') ||
+                       description.toLowerCase().includes('english');
+    const isTech = description.toLowerCase().includes('tech') || 
+                  description.toLowerCase().includes('software') ||
+                  description.toLowerCase().includes('digital') ||
+                  description.toLowerCase().includes('technology');
+    const isFinance = description.toLowerCase().includes('finance') || 
+                     description.toLowerCase().includes('payment') ||
+                     description.toLowerCase().includes('banking') ||
+                     description.toLowerCase().includes('financial');
+    
+    if (isEducation) {
+      return `The English language education market in Hong Kong is experiencing steady growth, driven by increasing demand for English proficiency among children and the importance of English in Hong Kong's international business environment. The market is expected to grow at a compound annual growth rate of 8.5% over the next five years, with parents increasingly investing in quality English education for their children's future success.`;
+    } else if (isTech) {
+      return `The technology sector in Hong Kong continues to expand rapidly, supported by government initiatives to develop the city as a regional tech hub. The fintech market, in particular, is experiencing unprecedented growth with increasing adoption of digital payment solutions and financial technology innovations.`;
+    } else if (isFinance) {
+      return `The financial services market in Hong Kong remains robust, with the city maintaining its position as a leading global financial center. The fintech sector is experiencing rapid transformation, driven by regulatory support and increasing demand for innovative financial solutions.`;
+    } else {
+      return `The market for ${companyName}'s services is experiencing positive growth trends, driven by increasing demand for specialized solutions and the company's strong market positioning. The industry continues to evolve with new opportunities emerging from technological advancements and changing consumer preferences.`;
+    }
+  };
+
+  // Generate intelligent financial strength statement
+  const generateFinancialStrengthStatement = (): JSX.Element => {
+    const totalAssets = getTotalAssets();
+    const cashBalance = getCashBalance();
+    const revenue = getRevenue();
+    
+    return (
+      <>
+        Our strong financial position, with total assets of <span className="bg-yellow-200 px-1 rounded font-semibold">${totalAssets}</span> and cash reserves of <span className="bg-yellow-200 px-1 rounded font-semibold">${cashBalance}</span>, provides us with the resources needed to continue our growth and expansion plans. Our solid revenue base of <span className="bg-yellow-200 px-1 rounded font-semibold">${revenue}</span> demonstrates our ability to generate sustainable income while maintaining healthy cash flow.
+      </>
     );
   };
 
@@ -736,7 +870,10 @@ export function SECDocumentPreview({
               
               <p className="text-lg font-bold mb-2">Market Opportunity</p>
               <p className="mb-4 text-sm">
-                The English language education market in Hong Kong is experiencing steady growth, driven by increasing demand for English proficiency among children and the importance of English in Hong Kong's international business environment. Our strong financial position, with total assets of <span className="bg-yellow-200 px-1 rounded font-semibold">${totalAssets}</span> and cash reserves of <span className="bg-yellow-200 px-1 rounded font-semibold">${cashBalance}</span>, provides us with the resources needed to continue our growth and expansion plans.
+                {generateMarketAnalysis()}
+              </p>
+              <p className="mb-4 text-sm">
+                {generateFinancialStrengthStatement()}
               </p>
             </div>
         </div>

@@ -432,6 +432,7 @@ export function ProspectusGenerator() {
               <SECDocumentPreview 
                 financialData={financialData}
                 companyName={companyName}
+                companyDescription={companyDescription}
                 companyAddress={companyAddress}
                 companyPhone={companyPhone}
                 tickerSymbol={tickerSymbol}
