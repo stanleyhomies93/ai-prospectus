@@ -361,18 +361,10 @@ export function SECDocumentPreview({
     const summary = analyzeFinancialData(doc);
     
     return (
-      <div className="bg-gray-50 border-l-4 border-blue-500 p-4 mb-4 rounded-r">
-        <h4 className="font-semibold text-gray-800 mb-2 flex items-center">
-          📊 Data Analysis Summary: {doc.title}
-        </h4>
-        <div className="text-sm text-gray-700 space-y-1">
-          {summary.map((insight, index) => (
-            <p key={index} className="flex items-start">
-              <span className="text-blue-600 mr-2">•</span>
-              {insight}
-            </p>
-          ))}
-        </div>
+      <div className="mb-4">
+        <p className="text-sm text-gray-700 mb-2">
+          <strong>Data Analysis Summary:</strong> {summary.join(' ')}
+        </p>
       </div>
     );
   };
