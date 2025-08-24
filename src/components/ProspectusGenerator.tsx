@@ -5,6 +5,210 @@ import { FinancialDataUploader, FinancialData } from './FinancialDataUploader';
 import { FinancialDataPreview } from './FinancialDataPreview';
 import { ErrorBoundary } from './ErrorBoundary';
 import { PresentationPreview } from './PresentationPreview';
+
+// Risk Factors Database
+const RISK_FACTORS_DATABASE = {
+  industries: {
+    education: {
+      name: 'Education',
+      countries: {
+        hong_kong: {
+          name: 'Hong Kong',
+          riskFactors: [
+            {
+              title: 'Regulatory Changes in Education Sector',
+              description: 'Changes in Hong Kong education policies, curriculum requirements, or licensing regulations could significantly impact our operations and require costly compliance measures.'
+            },
+            {
+              title: 'Competition from International Schools',
+              description: 'Increasing competition from international schools and online education platforms could affect our market share and pricing power.'
+            },
+            {
+              title: 'Economic Downturn Impact',
+              description: 'Economic recessions or financial instability in Hong Kong could reduce parents\' ability to pay for premium English education services.'
+            },
+            {
+              title: 'Teacher Recruitment and Retention',
+              description: 'Difficulty in recruiting and retaining qualified English teachers, especially native speakers, could impact our service quality and growth plans.'
+            },
+            {
+              title: 'Technology Disruption',
+              description: 'Rapid adoption of online learning platforms and AI-powered education tools could disrupt traditional classroom-based learning models.'
+            },
+            {
+              title: 'Currency Fluctuation Risk',
+              description: 'Fluctuations in the Hong Kong dollar exchange rate could affect our costs for international materials and teacher salaries.'
+            },
+            {
+              title: 'Political and Social Stability',
+              description: 'Political changes or social unrest in Hong Kong could impact our operations, student enrollment, and overall business environment.'
+            },
+            {
+              title: 'Dependence on Brand License',
+              description: 'We depend on our license from our related company to use the brand name for our business operations. Any termination or modification of this license could materially adversely affect our business and results of operations.'
+            }
+          ]
+        },
+        singapore: {
+          name: 'Singapore',
+          riskFactors: [
+            {
+              title: 'Strict Education Regulations',
+              description: 'Singapore\'s stringent education regulations and compliance requirements could increase operational costs and limit business flexibility.'
+            },
+            {
+              title: 'High Operating Costs',
+              description: 'High rental costs and labor expenses in Singapore could significantly impact our profitability and expansion plans.'
+            },
+            {
+              title: 'Government Education Policies',
+              description: 'Changes in Singapore\'s bilingual education policy or government support for private education could affect our market position.'
+            }
+          ]
+        },
+        china: {
+          name: 'China',
+          riskFactors: [
+            {
+              title: 'Regulatory Uncertainty',
+              description: 'Frequent changes in China\'s education regulations, including restrictions on foreign investment in education, could impact our business model.'
+            },
+            {
+              title: 'Geopolitical Tensions',
+              description: 'Political tensions between China and other countries could affect our ability to recruit international teachers and access foreign educational resources.'
+            },
+            {
+              title: 'Economic Policy Changes',
+              description: 'Changes in China\'s economic policies, including capital controls, could affect our financial operations and investment plans.'
+            }
+          ]
+        }
+      }
+    },
+    technology: {
+      name: 'Technology',
+      countries: {
+        hong_kong: {
+          name: 'Hong Kong',
+          riskFactors: [
+            {
+              title: 'Cybersecurity Threats',
+              description: 'Increasing cybersecurity threats and data breaches could compromise our systems, customer data, and damage our reputation.'
+            },
+            {
+              title: 'Rapid Technology Changes',
+              description: 'Fast-paced technological advancements could make our products obsolete and require significant R&D investments to stay competitive.'
+            },
+            {
+              title: 'Talent Competition',
+              description: 'Intense competition for skilled technology professionals in Hong Kong could increase labor costs and limit our growth potential.'
+            },
+            {
+              title: 'Regulatory Compliance',
+              description: 'Evolving technology regulations, including data privacy laws and fintech regulations, could increase compliance costs and operational complexity.'
+            }
+          ]
+        },
+        singapore: {
+          name: 'Singapore',
+          riskFactors: [
+            {
+              title: 'High Operating Costs',
+              description: 'Singapore\'s high cost of living and business operations could impact our profitability and ability to scale efficiently.'
+            },
+            {
+              title: 'Government Technology Policies',
+              description: 'Changes in Singapore\'s technology policies or government support programs could affect our business environment and growth opportunities.'
+            }
+          ]
+        }
+      }
+    },
+    finance: {
+      name: 'Financial Services',
+      countries: {
+        hong_kong: {
+          name: 'Hong Kong',
+          riskFactors: [
+            {
+              title: 'Regulatory Changes',
+              description: 'Changes in Hong Kong\'s financial regulations, including fintech licensing requirements, could significantly impact our operations.'
+            },
+            {
+              title: 'Market Volatility',
+              description: 'Financial market volatility and economic uncertainty could affect our revenue streams and customer demand.'
+            },
+            {
+              title: 'Cybersecurity Risks',
+              description: 'Financial services are prime targets for cyber attacks, which could result in significant financial losses and reputational damage.'
+            },
+            {
+              title: 'Competition from Traditional Banks',
+              description: 'Competition from established banks and financial institutions with greater resources could limit our market share and pricing power.'
+            }
+          ]
+        }
+      }
+    },
+    general: {
+      name: 'General Business',
+      countries: {
+        hong_kong: {
+          name: 'Hong Kong',
+          riskFactors: [
+            {
+              title: 'Economic Uncertainty',
+              description: 'Economic downturns, inflation, or changes in consumer spending patterns could negatively impact our business performance and growth prospects.'
+            },
+            {
+              title: 'Supply Chain Disruptions',
+              description: 'Global supply chain disruptions, trade tensions, or logistics challenges could affect our operations and increase costs.'
+            },
+            {
+              title: 'Regulatory Compliance',
+              description: 'Changes in business regulations, tax laws, or compliance requirements could increase operational costs and administrative burden.'
+            },
+            {
+              title: 'Competition Risk',
+              description: 'Intense competition from established players and new market entrants could affect our market position, pricing, and profitability.'
+            },
+            {
+              title: 'Talent Acquisition',
+              description: 'Difficulty in attracting and retaining qualified employees could limit our growth potential and operational efficiency.'
+            }
+          ]
+        },
+        singapore: {
+          name: 'Singapore',
+          riskFactors: [
+            {
+              title: 'High Operating Costs',
+              description: 'Singapore\'s high cost of living and business operations could impact our profitability and ability to scale efficiently.'
+            },
+            {
+              title: 'Regulatory Environment',
+              description: 'Singapore\'s strict regulatory environment could increase compliance costs and limit business flexibility.'
+            }
+          ]
+        },
+        china: {
+          name: 'China',
+          riskFactors: [
+            {
+              title: 'Regulatory Uncertainty',
+              description: 'Frequent changes in China\'s business regulations and policies could create uncertainty and impact our operations.'
+            },
+            {
+              title: 'Geopolitical Risks',
+              description: 'Geopolitical tensions and trade disputes could affect our business relationships and market access.'
+            }
+          ]
+        }
+      }
+    }
+  }
+};
+
 export function ProspectusGenerator() {
   const [activeStep, setActiveStep] = useState(1);
   const [selectedTemplate, setSelectedTemplate] = useState('standard');
@@ -41,6 +245,12 @@ export function ProspectusGenerator() {
   }]);
   const [newRiskTitle, setNewRiskTitle] = useState('');
   const [newRiskDescription, setNewRiskDescription] = useState('');
+  
+  // Intelligent Risk Factors System
+  const [selectedIndustry, setSelectedIndustry] = useState<string>('');
+  const [selectedCountry, setSelectedCountry] = useState<string>('');
+  const [suggestedRiskFactors, setSuggestedRiskFactors] = useState<Array<{title: string; description: string}>>([]);
+  const [riskFactorsStep, setRiskFactorsStep] = useState<'industry' | 'country' | 'review' | 'edit'>('industry');
   const [companyInfoMethod, setCompanyInfoMethod] = useState<'manual' | 'ai' | null>('manual');
   const [companyWebsite, setCompanyWebsite] = useState('www.englishlearning.hk');
   const [companyName, setCompanyName] = useState('English Learning Academy Ltd.');
@@ -154,6 +364,44 @@ export function ProspectusGenerator() {
     }]);
     setNewRiskTitle('');
     setNewRiskDescription('');
+  };
+
+  // Intelligent Risk Factors Functions
+  const handleIndustrySelect = (industry: string) => {
+    setSelectedIndustry(industry);
+    setRiskFactorsStep('country');
+  };
+
+  const handleCountrySelect = (country: string) => {
+    setSelectedCountry(country);
+    // Get suggested risk factors based on industry and country
+    const industryData = RISK_FACTORS_DATABASE.industries[selectedIndustry as keyof typeof RISK_FACTORS_DATABASE.industries];
+    if (industryData && industryData.countries[country as keyof typeof industryData.countries]) {
+      const countryData = industryData.countries[country as keyof typeof industryData.countries];
+      setSuggestedRiskFactors(countryData.riskFactors);
+    }
+    setRiskFactorsStep('review');
+  };
+
+  const handleAcceptSuggestedRiskFactors = () => {
+    setRiskFactors(suggestedRiskFactors);
+    setRiskFactorsStep('edit');
+  };
+
+  const handleCustomizeRiskFactors = () => {
+    setRiskFactorsStep('edit');
+  };
+
+  const handleResetRiskFactors = () => {
+    setSelectedIndustry('');
+    setSelectedCountry('');
+    setSuggestedRiskFactors([]);
+    setRiskFactorsStep('industry');
+  };
+
+  const getAvailableCountries = (industry: string) => {
+    const industryData = RISK_FACTORS_DATABASE.industries[industry as keyof typeof RISK_FACTORS_DATABASE.industries];
+    return industryData ? Object.keys(industryData.countries) : [];
   };
   const handleRemoveRiskFactor = (index: number) => {
     setRiskFactors(riskFactors.filter((_, i) => i !== index));
@@ -1028,79 +1276,266 @@ export function ProspectusGenerator() {
                             Risk Factors Section
                           </h3>
                           <div className="flex space-x-2">
-                            <button className="text-blue-700 hover:bg-blue-50 p-1 rounded">
-                              <EditIcon size={18} />
+                            <button className="text-blue-700 hover:bg-blue-50 p-1 rounded" onClick={handleResetRiskFactors}>
+                              <RefreshCwIcon size={18} />
                             </button>
                             <button className="text-blue-700 hover:bg-blue-50 p-1 rounded">
                               <EyeIcon size={18} />
                             </button>
                           </div>
                         </div>
-                        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
-                          <div className="flex items-start">
-                            <AlertTriangleIcon size={20} className="text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
-                            <div>
-                              <h5 className="font-medium text-blue-800">
-                                Risk Factor Disclosure Requirements
-                              </h5>
-                              <p className="text-sm text-gray-700 mt-1">
-                                The SEC requires comprehensive disclosure of
-                                material risks. Being thorough and specific
-                                helps protect your company from future
-                                litigation.
-                              </p>
+                        
+                        {/* Step Indicator */}
+                        <div className="mb-6">
+                          <div className="flex items-center space-x-2">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${riskFactorsStep === 'industry' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                              1
+                            </div>
+                            <div className={`flex-1 h-1 ${riskFactorsStep === 'country' || riskFactorsStep === 'review' || riskFactorsStep === 'edit' ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${riskFactorsStep === 'country' ? 'bg-blue-600 text-white' : riskFactorsStep === 'review' || riskFactorsStep === 'edit' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                              2
+                            </div>
+                            <div className={`flex-1 h-1 ${riskFactorsStep === 'review' || riskFactorsStep === 'edit' ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${riskFactorsStep === 'review' ? 'bg-blue-600 text-white' : riskFactorsStep === 'edit' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                              3
+                            </div>
+                            <div className={`flex-1 h-1 ${riskFactorsStep === 'edit' ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${riskFactorsStep === 'edit' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                              4
                             </div>
                           </div>
+                          <div className="flex justify-between text-xs text-gray-500 mt-2">
+                            <span>Select Industry</span>
+                            <span>Select Country</span>
+                            <span>Review Suggestions</span>
+                            <span>Customize</span>
+                          </div>
                         </div>
-                        <div className="space-y-4 mb-6">
-                          {riskFactors.map((risk, index) => <div key={index} className="bg-gray-50 p-3 rounded-md border border-gray-200">
-                              <div className="flex justify-between items-start">
-                                <div className="flex-1">
-                                  <h4 className="font-medium text-gray-800 mb-1">
-                                    {risk.title}
-                                  </h4>
-                                  <p className="text-sm text-gray-600">
-                                    {risk.description}
+
+                        {/* Step 1: Industry Selection */}
+                        {riskFactorsStep === 'industry' && (
+                          <div>
+                            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                              <div className="flex items-start">
+                                <AlertTriangleIcon size={20} className="text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
+                                <div>
+                                  <h5 className="font-medium text-blue-800">
+                                    Intelligent Risk Factor Selection
+                                  </h5>
+                                  <p className="text-sm text-gray-700 mt-1">
+                                    Select your industry and country to get pre-configured, relevant risk factors that are commonly required for your business type and location.
                                   </p>
                                 </div>
-                                <button className="text-gray-400 hover:text-red-500 ml-2" onClick={() => handleRemoveRiskFactor(index)}>
-                                  <TrashIcon size={16} />
+                              </div>
+                            </div>
+                            
+                            <h4 className="font-medium text-gray-800 mb-4">Select Your Industry</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {Object.entries(RISK_FACTORS_DATABASE.industries).map(([key, industry]) => (
+                                <div 
+                                  key={key}
+                                  className="border border-gray-200 rounded-lg p-4 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer"
+                                  onClick={() => handleIndustrySelect(key)}
+                                >
+                                  <h5 className="font-medium text-gray-800 mb-2">{industry.name}</h5>
+                                  <p className="text-sm text-gray-600">
+                                    {Object.keys(industry.countries).length} countries available
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Step 2: Country Selection */}
+                        {riskFactorsStep === 'country' && (
+                          <div>
+                            <div className="flex items-center mb-4">
+                              <button 
+                                className="text-blue-700 hover:text-blue-800 mr-3 flex items-center"
+                                onClick={() => setRiskFactorsStep('industry')}
+                              >
+                                <ArrowLeftIcon size={16} className="mr-1" />
+                                Back to Industry
+                              </button>
+                              <h4 className="font-medium text-gray-800">
+                                Select Country for {RISK_FACTORS_DATABASE.industries[selectedIndustry as keyof typeof RISK_FACTORS_DATABASE.industries]?.name}
+                              </h4>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {getAvailableCountries(selectedIndustry).map((countryKey) => {
+                                const countryData = RISK_FACTORS_DATABASE.industries[selectedIndustry as keyof typeof RISK_FACTORS_DATABASE.industries]?.countries[countryKey as keyof typeof RISK_FACTORS_DATABASE.industries[typeof selectedIndustry]['countries']];
+                                return (
+                                  <div 
+                                    key={countryKey}
+                                    className="border border-gray-200 rounded-lg p-4 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer"
+                                    onClick={() => handleCountrySelect(countryKey)}
+                                  >
+                                    <h5 className="font-medium text-gray-800 mb-2">{countryData?.name}</h5>
+                                    <p className="text-sm text-gray-600">
+                                      {countryData?.riskFactors.length} risk factors available
+                                    </p>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Step 3: Review Suggestions */}
+                        {riskFactorsStep === 'review' && (
+                          <div>
+                            <div className="flex items-center mb-4">
+                              <button 
+                                className="text-blue-700 hover:text-blue-800 mr-3 flex items-center"
+                                onClick={() => setRiskFactorsStep('country')}
+                              >
+                                <ArrowLeftIcon size={16} className="mr-1" />
+                                Back to Country
+                              </button>
+                              <h4 className="font-medium text-gray-800">
+                                Review Suggested Risk Factors
+                              </h4>
+                            </div>
+                            
+                            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                              <div className="flex items-start">
+                                <CheckIcon size={20} className="text-green-600 mt-0.5 mr-3 flex-shrink-0" />
+                                <div>
+                                  <h5 className="font-medium text-green-800">
+                                    {suggestedRiskFactors.length} Risk Factors Found
+                                  </h5>
+                                  <p className="text-sm text-green-700 mt-1">
+                                    Based on your selection of {RISK_FACTORS_DATABASE.industries[selectedIndustry as keyof typeof RISK_FACTORS_DATABASE.industries]?.name} industry in {RISK_FACTORS_DATABASE.industries[selectedIndustry as keyof typeof RISK_FACTORS_DATABASE.industries]?.countries[selectedCountry as keyof typeof RISK_FACTORS_DATABASE.industries[typeof selectedIndustry]['countries']]?.name}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
+                              {suggestedRiskFactors.map((risk, index) => (
+                                <div key={index} className="bg-gray-50 p-3 rounded-md border border-gray-200">
+                                  <div className="flex-1">
+                                    <h4 className="font-medium text-gray-800 mb-1">
+                                      {risk.title}
+                                    </h4>
+                                    <p className="text-sm text-gray-600">
+                                      {risk.description}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="flex space-x-4">
+                              <button 
+                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center"
+                                onClick={handleAcceptSuggestedRiskFactors}
+                              >
+                                <CheckIcon size={16} className="mr-2" />
+                                Accept All Suggestions
+                              </button>
+                              <button 
+                                className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 flex items-center"
+                                onClick={handleCustomizeRiskFactors}
+                              >
+                                <EditIcon size={16} className="mr-2" />
+                                Customize Selection
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Step 4: Edit and Customize */}
+                        {riskFactorsStep === 'edit' && (
+                          <div>
+                            <div className="flex items-center mb-4">
+                              <button 
+                                className="text-blue-700 hover:text-blue-800 mr-3 flex items-center"
+                                onClick={() => setRiskFactorsStep('review')}
+                              >
+                                <ArrowLeftIcon size={16} className="mr-1" />
+                                Back to Review
+                              </button>
+                              <h4 className="font-medium text-gray-800">
+                                Customize Risk Factors
+                              </h4>
+                            </div>
+                            
+                            <div className="space-y-4 mb-6">
+                              {riskFactors.map((risk, index) => (
+                                <div key={index} className="bg-gray-50 p-3 rounded-md border border-gray-200">
+                                  <div className="flex justify-between items-start">
+                                    <div className="flex-1">
+                                      <h4 className="font-medium text-gray-800 mb-1">
+                                        {risk.title}
+                                      </h4>
+                                      <p className="text-sm text-gray-600">
+                                        {risk.description}
+                                      </p>
+                                    </div>
+                                    <button 
+                                      className="text-gray-400 hover:text-red-500 ml-2" 
+                                      onClick={() => handleRemoveRiskFactor(index)}
+                                    >
+                                      <TrashIcon size={16} />
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="border border-gray-200 rounded-md p-4 bg-gray-50 mb-6">
+                              <h4 className="font-medium text-gray-800 mb-3">
+                                Add Custom Risk Factor
+                              </h4>
+                              <div className="space-y-3">
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Risk Title
+                                  </label>
+                                  <input 
+                                    type="text" 
+                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                    placeholder="E.g., Cybersecurity Risk" 
+                                    value={newRiskTitle} 
+                                    onChange={e => setNewRiskTitle(e.target.value)} 
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Risk Description
+                                  </label>
+                                  <textarea 
+                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                    rows={2} 
+                                    placeholder="Describe the risk and its potential impact on the business" 
+                                    value={newRiskDescription} 
+                                    onChange={e => setNewRiskDescription(e.target.value)}
+                                  ></textarea>
+                                </div>
+                                <button 
+                                  className="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center text-sm" 
+                                  onClick={handleAddRiskFactor}
+                                >
+                                  <PlusIcon size={14} className="mr-1" />
+                                  Add Risk Factor
                                 </button>
                               </div>
-                            </div>)}
-                        </div>
-                        <div className="border border-gray-200 rounded-md p-4 bg-gray-50 mb-6">
-                          <h4 className="font-medium text-gray-800 mb-3">
-                            Add New Risk Factor
-                          </h4>
-                          <div className="space-y-3">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Risk Title
-                              </label>
-                              <input type="text" className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="E.g., Cybersecurity Risk" value={newRiskTitle} onChange={e => setNewRiskTitle(e.target.value)} />
                             </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Risk Description
-                              </label>
-                              <textarea className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" rows={2} placeholder="Describe the risk and its potential impact on the business" value={newRiskDescription} onChange={e => setNewRiskDescription(e.target.value)}></textarea>
+
+                            <div className="mt-6 flex justify-between">
+                              <div className="text-sm text-gray-500">
+                                {riskFactors.length} risk factors added
+                              </div>
+                              <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center">
+                                <CheckIcon size={16} className="mr-2" />
+                                Mark Section Complete
+                              </button>
                             </div>
-                            <button className="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center text-sm" onClick={handleAddRiskFactor}>
-                              <PlusIcon size={14} className="mr-1" />
-                              Add Risk Factor
-                            </button>
                           </div>
-                        </div>
-                        <div className="mt-6 flex justify-between">
-                          <div className="text-sm text-gray-500">
-                            {riskFactors.length} risk factors added
-                          </div>
-                          <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center">
-                            <CheckIcon size={16} className="mr-2" />
-                            Mark Section Complete
-                          </button>
-                        </div>
+                        )}
                       </div>}
                     {expandedSection === 'businessOverview' && <div className="p-6">
                         <div className="flex items-center justify-between mb-4">
